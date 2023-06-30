@@ -1,0 +1,41 @@
+version: '3.8'
+services:
+  postgres:
+    image: postgres:latest
+    container_name: postgres
+    restart: always
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: password
+      POSTGRES_DB: dodoitsulife
+      POSTGRES_INITDB_ARGS: '--encoding=UTF-8'
+    ports:
+      - 5432:5432
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+
+  db-gui:
+    image: sosedoff/pgweb
+    restart: always
+    links:
+      - postgres
+    ports:
+      - 8081:8081
+    environment:
+      PGWEB_DATABASE_URL: postgres://postgres:password@postgres:5432/dodoitsulife?sslmode=disable
+
+  nest-app:
+    build:
+      context: .
+      dockerfile: Dockerfile.dev
+    volumes:
+      - .:/usr/src/app
+      - /usr/src/app/node_modules
+    links:
+      - postgres
+    ports:
+      - 3000:3000
+    command: npm run start:dev
+
+volumes:
+  pgdata:

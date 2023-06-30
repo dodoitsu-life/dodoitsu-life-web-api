@@ -1,0 +1,6 @@
+# Build stage
+FROM node:14 AS builder
+WORKDIR /usr/src/app
+COPY package*.json ./
+COPY . .
+RUN npm install
