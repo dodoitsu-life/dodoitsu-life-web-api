@@ -10,6 +10,10 @@ export class DodoitsuService {
     private readonly dodoitsuRepository: IDodoitsuRepository,
   ) {}
 
+  async countAll(): Promise<number> {
+    return this.dodoitsuRepository.count();
+  }
+
   async findLatest(page: number, limit: number): Promise<Dodoitsu[]> {
     return this.findDodoitsu(page, limit, { createdAt: 'DESC' });
   }

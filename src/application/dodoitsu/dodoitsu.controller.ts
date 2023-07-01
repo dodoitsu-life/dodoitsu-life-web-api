@@ -26,8 +26,11 @@ export class DodoitsuController {
     @Query('page', new DefaultValuePipe(1), ParseIntPipe) page: number,
     @Query('limit', new DefaultValuePipe(10), ParseIntPipe) limit: number,
   ): Promise<ApiResponse<Dodoitsu[]>> {
-    const dodoitsuList = await this.dodoitsuService.findLatest(page, limit);
-    return ApiResponse.success(dodoitsuList);
+    const [dodoitsuList, allCount] = await Promise.all([
+      this.dodoitsuService.findLatest(page, limit),
+      this.dodoitsuService.countAll(),
+    ]);
+    return ApiResponse.success(dodoitsuList, allCount);
   }
 
   @Get('popular')
@@ -36,8 +39,11 @@ export class DodoitsuController {
     @Query('page', new DefaultValuePipe(1), ParseIntPipe) page: number,
     @Query('limit', new DefaultValuePipe(10), ParseIntPipe) limit: number,
   ): Promise<ApiResponse<Dodoitsu[]>> {
-    const dodoitsuList = await this.dodoitsuService.findPopular(page, limit);
-    return ApiResponse.success(dodoitsuList);
+    const [dodoitsuList, allCount] = await Promise.all([
+      this.dodoitsuService.findPopular(page, limit),
+      this.dodoitsuService.countAll(),
+    ]);
+    return ApiResponse.success(dodoitsuList, allCount);
   }
 
   @Get(':id')
@@ -64,7 +70,7 @@ export class DodoitsuController {
     @Param('id', ParseIntPipe) id: number,
   ): Promise<ApiResponse<void>> {
     await this.dodoitsuService.increaseLike(id);
-    return ApiResponse.success(null, 'Like added successfully');
+    return ApiResponse.success(null, undefined, 'Like added successfully');
   }
 
   @Delete(':id/like')
@@ -73,6 +79,6 @@ export class DodoitsuController {
     @Param('id', ParseIntPipe) id: number,
   ): Promise<ApiResponse<void>> {
     await this.dodoitsuService.decreaseLike(id);
-    return ApiResponse.success(null, 'Like removed successfully');
+    return ApiResponse.success(null, undefined, 'Like removed successfully');
   }
 }
