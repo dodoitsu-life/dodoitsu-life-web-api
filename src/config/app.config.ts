@@ -5,5 +5,7 @@ export const appConfig = () => ({
   },
   database: {
     url: process.env.DB_URL,
+    ssl: process.env.DB_SSL === 'true',
+    synchronize: process.env.DB_SYNCHRONIZE === 'true',
   },
 });

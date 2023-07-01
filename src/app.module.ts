@@ -3,9 +3,9 @@ import { APP_FILTER } from '@nestjs/core';
 import { NestHttpExceptionFilter } from './common/exception-filter/ExceptionFilter';
 import { ConfigModule, ConfigService } from '@nestjs/config';
 import { TypeOrmModule } from '@nestjs/typeorm';
-import { TodoModule } from './application/todo/todo.module';
-import { Todo } from './domain/todo/todo.entity';
+import { DodoitsuModule } from './application/dodoitsu/dodoitsu.module';
 import { appConfig } from './config/app.config';
+import { createTypeOrmOptions } from './infrastructure/orm/datasource';
 
 @Module({
   imports: [
@@ -15,18 +15,11 @@ import { appConfig } from './config/app.config';
     }),
     TypeOrmModule.forRootAsync({
       imports: [ConfigModule],
-      useFactory: async (configService: ConfigService) => ({
-        name: 'default',
-        type: 'postgres',
-        url: configService.get('database.url'),
-        ssl: false,
-        synchronize: true,
-        entities: [Todo],
-        migrations: ['dist/migration/*.js'],
-      }),
+      useFactory: async (configService: ConfigService) =>
+        await createTypeOrmOptions(configService),
       inject: [ConfigService],
     }),
-    TodoModule,
+    DodoitsuModule,
   ],
   providers: [
     {

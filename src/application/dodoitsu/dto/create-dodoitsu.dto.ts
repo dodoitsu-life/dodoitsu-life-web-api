@@ -1,13 +1,13 @@
 import { ApiProperty } from '@nestjs/swagger';
 import { IsString, IsNotEmpty } from 'class-validator';
 
-export class CreateTodoDto {
+export class CreateDodoitsuDto {
   @ApiProperty()
   @IsString()
   @IsNotEmpty()
-  readonly title: string;
+  readonly content: string;
 
   @ApiProperty()
   @IsString()
-  readonly contents: string;
+  readonly description: string;
 }
