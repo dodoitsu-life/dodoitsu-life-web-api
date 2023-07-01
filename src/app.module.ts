@@ -3,8 +3,10 @@ import { APP_FILTER } from '@nestjs/core';
 import { NestHttpExceptionFilter } from './common/exception-filter/ExceptionFilter';
 import { ConfigModule, ConfigService } from '@nestjs/config';
 import { TypeOrmModule } from '@nestjs/typeorm';
-import { TodoModule } from './application/todo/todo.module';
+// import { TodoModule } from './application/todo/todo.module';
 import { Todo } from './domain/todo/todo.entity';
+import { DodoitsuModule } from './application/dodoitsu/dodoitsu.module';
+import { Dodoitsu } from './domain/dodoitsu/dodoitsu.entity';
 import { appConfig } from './config/app.config';
 
 @Module({
@@ -21,12 +23,13 @@ import { appConfig } from './config/app.config';
         url: configService.get('database.url'),
         ssl: false,
         synchronize: true,
-        entities: [Todo],
+        entities: [Todo, Dodoitsu],
         migrations: ['dist/migration/*.js'],
       }),
       inject: [ConfigService],
     }),
-    TodoModule,
+    // TodoModule,
+    DodoitsuModule,
   ],
   providers: [
     {
