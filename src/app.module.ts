@@ -4,8 +4,8 @@ import { NestHttpExceptionFilter } from './common/exception-filter/ExceptionFilt
 import { ConfigModule, ConfigService } from '@nestjs/config';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { DodoitsuModule } from './application/dodoitsu/dodoitsu.module';
-import { Dodoitsu } from './domain/dodoitsu/dodoitsu.entity';
 import { appConfig } from './config/app.config';
+import { createTypeOrmOptions } from './infrastructure/orm/datasource';
 
 @Module({
   imports: [
@@ -15,15 +15,8 @@ import { appConfig } from './config/app.config';
     }),
     TypeOrmModule.forRootAsync({
       imports: [ConfigModule],
-      useFactory: async (configService: ConfigService) => ({
-        name: 'default',
-        type: 'postgres',
-        url: configService.get('database.url'),
-        ssl: false,
-        synchronize: true,
-        entities: [Dodoitsu],
-        migrations: ['dist/migration/*.js'],
-      }),
+      useFactory: async (configService: ConfigService) =>
+        await createTypeOrmOptions(configService),
       inject: [ConfigService],
     }),
     DodoitsuModule,
