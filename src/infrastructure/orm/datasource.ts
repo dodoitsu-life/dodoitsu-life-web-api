@@ -9,7 +9,9 @@ export const createTypeOrmOptions = async (
     name: 'default',
     type: 'postgres',
     url: configService.get('database.url'),
-    ssl: configService.get('database.ssl'),
+    ssl: {
+      rejectUnauthorized: !configService.get('database.ssl'),
+    },
     synchronize: configService.get('database.synchronize'),
     entities: [Dodoitsu],
     migrations: ['dist/migration/*.js'],
