@@ -8,20 +8,29 @@ export class ApiResponse<TData> {
 
   public readonly data: Nullable<TData>;
 
-  private constructor(code: number, message: string, data?: TData) {
+  public readonly count?: number;
+
+  private constructor(
+    code: number,
+    message: string,
+    data?: TData,
+    count?: number,
+  ) {
     this.code = code;
     this.message = message;
     this.data = data || null;
+    this.count = count || undefined;
   }
 
   public static success<TData>(
     data?: TData,
+    count?: number,
     message?: string,
   ): ApiResponse<TData> {
     const resultCode: number = Code.SUCCESS.code;
     const resultMessage: string = message || Code.SUCCESS.message;
 
-    return new ApiResponse(resultCode, resultMessage, data);
+    return new ApiResponse(resultCode, resultMessage, data, count);
   }
 
   public static error<TData>(
