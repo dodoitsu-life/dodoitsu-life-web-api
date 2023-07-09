@@ -8,4 +8,12 @@ export const appConfig = () => ({
     ssl: process.env.DB_SSL === 'true',
     synchronize: process.env.DB_SYNCHRONIZE === 'true',
   },
+  session: {
+    secret: process.env.SESSION_SECRET || 'test',
+  },
+  auth: {
+    clientId: process.env.AUTH0_CLIENT_ID,
+    clientSecret: process.env.AUTH0_CLIENT_SECRET,
+    callbackUrl: process.env.AUTH0_CALLBACK_URL,
+  },
 });

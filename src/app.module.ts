@@ -4,6 +4,7 @@ import { NestHttpExceptionFilter } from './common/exception-filter/ExceptionFilt
 import { ConfigModule, ConfigService } from '@nestjs/config';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { DodoitsuModule } from './application/dodoitsu/dodoitsu.module';
+import { AuthModule } from './application/auth/auth.module';
 import { appConfig } from './config/app.config';
 import { createTypeOrmOptions } from './infrastructure/orm/datasource';
 
@@ -20,6 +21,7 @@ import { createTypeOrmOptions } from './infrastructure/orm/datasource';
       inject: [ConfigService],
     }),
     DodoitsuModule,
+    AuthModule,
   ],
   providers: [
     {
