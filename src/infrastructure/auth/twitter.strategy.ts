@@ -5,7 +5,7 @@ import { ConfigService } from '@nestjs/config';
 import { config } from 'process';
 
 @Injectable()
-export class TwitterStrategy extends PassportStrategy(Strategy, 'twitter') {
+export class TwitterStrategy extends PassportStrategy(Strategy) {
   constructor(private configService: ConfigService) {
     super({
       consumerKey: configService.get<string>('auth.clientId'),

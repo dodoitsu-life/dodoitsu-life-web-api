@@ -20,7 +20,6 @@ export class AuthController {
   }
 
   @Get('twitter/callback')
-  @Redirect('/')
   @UseGuards(AuthGuard('twitter'))
   async twitterLoginCallback(@Req() req: Request) {
     const user = await this.authService.handleCallback(req);
