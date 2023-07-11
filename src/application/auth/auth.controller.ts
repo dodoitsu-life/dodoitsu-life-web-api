@@ -6,8 +6,9 @@ import {
   UseGuards,
   Request,
 } from '@nestjs/common';
-import { AuthService } from '../../domain/auth/auth.service';
 import { AuthGuard } from '@nestjs/passport';
+import { AuthService } from '../../domain/auth/auth.service';
+import { ApiResponse } from '../../common/ApiResponse';
 
 @Controller('auth')
 export class AuthController {
@@ -24,9 +25,10 @@ export class AuthController {
   @UseGuards(AuthGuard('twitter'))
   async twitterLoginCallback(@Req() req: Request) {
     console.log(req);
-    const user = await this.authService.handleCallback(req);
-    // TODO: Add user to session
-    // @ts-ignore
-    req.session.user = user;
+    return ApiResponse.success(req);
+    // const user = await this.authService.handleCallback(req);
+    // // TODO: Add user to session
+    // // @ts-ignore
+    // req.session.user = user;
   }
 }
