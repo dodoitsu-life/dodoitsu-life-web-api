@@ -12,7 +12,9 @@ export class AuthService {
 
   async handleCallback(req: Request) {
     const user = await this.authRepository.getUserFromCallback(req);
+    console.log(user);
     const existingUser = await this.userService.findByTwitterId(user.twitterId);
+    console.log(existingUser);
 
     if (existingUser) {
       return existingUser;

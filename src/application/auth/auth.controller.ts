@@ -15,13 +15,15 @@ export class AuthController {
 
   @Get('twitter')
   @UseGuards(AuthGuard('twitter'))
-  async twitterLogin() {
+  twitterLogin() {
     // Initiates the Twitter login process
+    console.log('twitterLogin test');
   }
 
   @Get('twitter/callback')
   @UseGuards(AuthGuard('twitter'))
   async twitterLoginCallback(@Req() req: Request) {
+    console.log(req);
     const user = await this.authService.handleCallback(req);
     // TODO: Add user to session
     // @ts-ignore
