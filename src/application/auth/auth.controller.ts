@@ -14,11 +14,27 @@ import { ApiResponse } from '../../common/ApiResponse';
 export class AuthController {
   constructor(private readonly authService: AuthService) {}
 
+  @UseGuards(AuthGuard('google'))
+  @Get('google')
+  async signInWithGoogle() {}
+
+  @UseGuards(AuthGuard('google'))
+  @Get('google/callback')
+  async signInWithGoogleRedirect(@Req() req) {
+    const user = await this.authService.handleCallback(req);
+    req.session.user = user;
+  }
+
   @Get('twitter')
   @UseGuards(AuthGuard('twitter'))
   twitterLogin() {
     // Initiates the Twitter login process
-    console.log('twitterLogin test');
+  }
+
+  @Get('google')
+  @UseGuards(AuthGuard('google'))
+  googleLogin() {
+    // Initiates the Twitter login process
   }
 
   @Get('twitter/callback')

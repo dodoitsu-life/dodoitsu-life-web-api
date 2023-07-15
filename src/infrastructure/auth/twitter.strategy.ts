@@ -8,9 +8,9 @@ import { config } from 'process';
 export class TwitterStrategy extends PassportStrategy(Strategy) {
   constructor(private configService: ConfigService) {
     super({
-      consumerKey: configService.get<string>('auth.clientId'),
-      consumerSecret: configService.get<string>('auth.clientSecret'),
-      callbackURL: configService.get<string>('auth.callbackUrl'),
+      consumerKey: configService.get<string>('auth.twitter.clientId'),
+      consumerSecret: configService.get<string>('auth.twitter.clientSecret'),
+      callbackURL: configService.get<string>('auth.twitter.callbackUrl'),
     });
   }
 

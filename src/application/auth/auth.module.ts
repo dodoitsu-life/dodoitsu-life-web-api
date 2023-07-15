@@ -8,6 +8,7 @@ import { SYMBOL } from '../../domain/auth/auth.repository.interface';
 import { AuthRepository } from '../../infrastructure/auth/auth.repository';
 import { PassportModule } from '@nestjs/passport';
 import { TwitterStrategy } from '../../infrastructure/auth/twitter.strategy';
+import { GoogleStrategy } from 'src/infrastructure/auth/google.strategy';
 import { User } from 'src/domain/user/user.entity';
 import { SYMBOL as USERSYMBOL } from '../../domain/user/user.repository.interface';
 import { UserRepository } from 'src/infrastructure/orm/user/user.repository';
@@ -26,6 +27,7 @@ import { ConfigModule } from '@nestjs/config';
     AuthService,
     UserService,
     TwitterStrategy,
+    GoogleStrategy,
     {
       provide: SYMBOL,
       useClass: AuthRepository,

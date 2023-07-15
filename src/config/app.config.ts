@@ -14,6 +14,11 @@ export const appConfig = () => ({
   auth: {
     clientId: process.env.AUTH0_CLIENT_ID,
     clientSecret: process.env.AUTH0_CLIENT_SECRET,
-    callbackUrl: process.env.AUTH0_CALLBACK_URL,
+    twitter: {
+      callbackUrl: process.env.AUTH0_TWITTER_CALLBACK_URL,
+    },
+    google: {
+      callbackUrl: process.env.AUTH0_GOOGLE_CALLBACK_URL,
+    },
   },
 });
