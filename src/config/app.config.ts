@@ -1,7 +1,8 @@
 export const appConfig = () => ({
   port: parseInt(process.env.PORT, 10) || 3000,
   dodoitsuLifeCallbackUrl:
-    process.env.DODOITSU_LIFE_CALLBACK_URL || 'http://localhost:3000',
+    process.env.DODOITSU_LIFE_CALLBACK_URL ||
+    'http://localhost:3000/api/auth/login/callback',
   cqrsOptions: {
     origin: process.env.CQRS_ORIGIN || 'http://localhost:3000',
   },
@@ -12,6 +13,7 @@ export const appConfig = () => ({
   },
   session: {
     secret: process.env.SESSION_SECRET || 'secret',
+    domain: process.env.SESSION_DOMAIN || 'localhost',
   },
   auth: {
     twitter: {

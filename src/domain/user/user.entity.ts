@@ -14,4 +14,7 @@ export class User {
 
   @Column()
   photo: string;
+
+  @Column({ type: 'timestamp', default: () => 'CURRENT_TIMESTAMP' })
+  createdAt;
 }
