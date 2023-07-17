@@ -3,6 +3,7 @@ import { SwaggerModule, DocumentBuilder } from '@nestjs/swagger';
 import { ValidationPipe } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import * as session from 'express-session';
+import * as passport from 'passport';
 import { AppModule } from './app.module';
 
 async function bootstrap() {
@@ -14,20 +15,6 @@ async function bootstrap() {
   // global pipes
   app.useGlobalPipes(new ValidationPipe());
 
-  // session
-  app.use(
-    session({
-      secret: configService.get<string>('session.secret'),
-      // resave: false,
-      // saveUninitialized: false,
-      // cookie: {
-      //   httpOnly: true,
-      //   secure: configService.get<boolean>('session.cookie.secure'),
-      //   maxAge: configService.get<number>('session.cookie.maxAge'),
-      // },
-    }),
-  );
-
   // CORS
   app.enableCors({
     origin: configService.get<string>('cqrsOptions.origin'),
@@ -36,6 +23,17 @@ async function bootstrap() {
     methods: 'GET,HEAD,PUT,PATCH,POST,DELETE',
     credentials: true,
   });
+
+  // session
+  app.use(
+    session({
+      secret: configService.get<string>('session.secret'),
+      resave: false,
+      saveUninitialized: false,
+    }),
+  );
+  app.use(passport.initialize());
+  app.use(passport.session());
 
   // Swagger
   const config = new DocumentBuilder()
