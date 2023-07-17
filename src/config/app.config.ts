@@ -1,5 +1,7 @@
 export const appConfig = () => ({
   port: parseInt(process.env.PORT, 10) || 3000,
+  dodoitsuLifeCallbackUrl:
+    process.env.DODOITSU_LIFE_CALLBACK_URL || 'http://localhost:3000',
   cqrsOptions: {
     origin: process.env.CQRS_ORIGIN || 'http://localhost:3000',
   },
@@ -9,16 +11,13 @@ export const appConfig = () => ({
     synchronize: process.env.DB_SYNCHRONIZE === 'true',
   },
   session: {
-    secret: process.env.SESSION_SECRET || 'test',
+    secret: process.env.SESSION_SECRET || 'secret',
   },
   auth: {
-    clientId: process.env.AUTH0_CLIENT_ID,
-    clientSecret: process.env.AUTH0_CLIENT_SECRET,
     twitter: {
-      callbackUrl: process.env.AUTH0_TWITTER_CALLBACK_URL,
-    },
-    google: {
-      callbackUrl: process.env.AUTH0_GOOGLE_CALLBACK_URL,
+      consumerKey: process.env.TWITTER_CONSUMER_KEY,
+      consumerSecret: process.env.TWITTER_CONSUMER_SECRET,
+      callbackUrl: process.env.TWITTER_CALLBACK_URL,
     },
   },
 });
