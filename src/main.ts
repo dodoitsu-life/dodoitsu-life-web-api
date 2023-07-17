@@ -30,9 +30,6 @@ async function bootstrap() {
       secret: configService.get<string>('session.secret'),
       resave: true,
       saveUninitialized: false,
-      cookie: {
-        domain: configService.get<string>('session.domain'),
-      },
     }),
   );
   app.use(passport.initialize());

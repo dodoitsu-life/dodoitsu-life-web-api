@@ -13,7 +13,6 @@ export const appConfig = () => ({
   },
   session: {
     secret: process.env.SESSION_SECRET || 'secret',
-    domain: process.env.SESSION_DOMAIN || 'localhost',
   },
   auth: {
     twitter: {
