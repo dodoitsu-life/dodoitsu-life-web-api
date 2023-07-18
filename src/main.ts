@@ -2,6 +2,8 @@ import { NestFactory } from '@nestjs/core';
 import { SwaggerModule, DocumentBuilder } from '@nestjs/swagger';
 import { ValidationPipe } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
+import * as session from 'express-session';
+import * as passport from 'passport';
 import { AppModule } from './app.module';
 
 async function bootstrap() {
@@ -16,9 +18,22 @@ async function bootstrap() {
   // CORS
   app.enableCors({
     origin: configService.get<string>('cqrsOptions.origin'),
+    allowedHeaders:
+      'Origin, X-Requested-With, Content-Type, Accept, Authorization',
     methods: 'GET,HEAD,PUT,PATCH,POST,DELETE',
     credentials: true,
   });
+
+  // session
+  app.use(
+    session({
+      secret: configService.get<string>('session.secret'),
+      resave: true,
+      saveUninitialized: false,
+    }),
+  );
+  app.use(passport.initialize());
+  app.use(passport.session());
 
   // Swagger
   const config = new DocumentBuilder()
