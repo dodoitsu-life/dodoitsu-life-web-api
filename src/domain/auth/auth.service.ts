@@ -49,7 +49,7 @@ export class AuthService {
 
     const accessToken = await this.jwtService.sign(payload, {
       secret: this.configService.get<string>('auth.jwt.secret'),
-      expiresIn: '40m',
+      expiresIn: this.configService.get<string>('auth.jwt.expire'),
     });
 
     const refreshToken = await this.generateRefreshToken(user);
@@ -69,7 +69,6 @@ export class AuthService {
   }
 
   async handleRefreshToken(refreshToken: string): Promise<User> {
-    // find the user associated with the refresh token
     const user = await this.userRepository.findOne({ refreshToken });
 
     if (!user) {
