@@ -8,9 +8,8 @@ export class UserService {
     @Inject(SYMBOL)
     private readonly userRepository: IUserRepository,
   ) {}
-
-  async findByTwitterId(twitterId: string): Promise<User | undefined> {
-    return this.userRepository.findByTwitterId(twitterId);
+  async findOne(criteria: Partial<User>): Promise<User | undefined> {
+    return this.userRepository.findOne(criteria);
   }
 
   async create(user: Partial<User>): Promise<User> {

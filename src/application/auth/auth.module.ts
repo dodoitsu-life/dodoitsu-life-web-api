@@ -10,20 +10,25 @@ import { User } from 'src/domain/user/user.entity';
 import { SYMBOL as USERSYMBOL } from '../../domain/user/user.repository.interface';
 import { UserRepository } from 'src/infrastructure/orm/user/user.repository';
 import { ConfigModule } from '@nestjs/config';
+import { JwtStrategy } from 'src/infrastructure/auth/jwt.strategy';
+import { JwtModule, JwtService } from '@nestjs/jwt';
+import { ConfigService } from '@nestjs/config';
 
 @Module({
   imports: [
     TypeOrmModule.forFeature([User]),
-    AuthModule,
     UserModule,
     ConfigModule,
     PassportModule.register({ session: true }),
+    JwtModule,
   ],
   controllers: [AuthController],
   providers: [
     AuthService,
     UserService,
+    JwtService,
     TwitterStrategy,
+    JwtStrategy,
     {
       provide: USERSYMBOL,
       useClass: UserRepository,

@@ -10,14 +10,18 @@ export class UserRepository implements IUserRepository {
     @InjectEntityManager()
     private readonly entityManager: EntityManager,
   ) {}
-
-  async findByTwitterId(twitterId: string): Promise<User | undefined> {
+  async findOne(criteria: Partial<User>): Promise<User | undefined> {
     return this.entityManager.findOne(User, {
-      where: { twitterId },
+      where: criteria,
     });
   }
 
   async create(user: User): Promise<User> {
+    const newUser = this.entityManager.create(User, user);
+    return this.entityManager.save(newUser);
+  }
+
+  async save(user: User): Promise<User> {
     return this.entityManager.save(user);
   }
 }

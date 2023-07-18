@@ -20,5 +20,9 @@ export const appConfig = () => ({
       consumerSecret: process.env.TWITTER_CONSUMER_SECRET,
       callbackUrl: process.env.TWITTER_CALLBACK_URL,
     },
+    jwt: {
+      secret: process.env.JWT_SECRET || 'secret',
+      expire: process.env.JWT_EXPIRE || '4h',
+    },
   },
 });

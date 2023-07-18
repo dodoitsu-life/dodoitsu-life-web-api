@@ -17,4 +17,7 @@ export class User {
 
   @Column({ type: 'timestamp', default: () => 'CURRENT_TIMESTAMP' })
   createdAt;
+
+  @Column({ nullable: true })
+  refreshToken: string;
 }
