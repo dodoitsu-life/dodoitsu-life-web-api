@@ -1,0 +1,7 @@
+{
+    "prettier.jsxSingleQuote": true,
+    "editor.formatOnSave": true,
+    "prettier.printWidth": 80,
+    "prettier.tabWidth": 2,
+    "editor.defaultFormatter": "svipas.prettier-plus"
+}
