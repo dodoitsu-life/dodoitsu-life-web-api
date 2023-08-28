@@ -23,7 +23,7 @@ export class AuthService {
 
   async handleCallback(req: Request & { user: UserPayload }): Promise<User> {
     const user = req.user;
-    let userEntity = new User();
+    const userEntity = new User();
 
     userEntity.twitterId = user.twitterId;
     userEntity.name = user.name;

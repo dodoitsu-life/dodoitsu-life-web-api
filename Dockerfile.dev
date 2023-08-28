@@ -2,5 +2,7 @@
 FROM node:14 AS builder
 WORKDIR /usr/src/app
 COPY package*.json ./
+COPY env/.env.docker .env
 COPY . .
 RUN npm install
+RUN apt-get update && apt-get install -y vim

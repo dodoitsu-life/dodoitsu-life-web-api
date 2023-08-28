@@ -6,13 +6,13 @@ import { TypeOrmModule } from '@nestjs/typeorm';
 import { DodoitsuModule } from './application/dodoitsu/dodoitsu.module';
 import { AuthModule } from './application/auth/auth.module';
 import { appConfig } from './config/app.config';
-import { createTypeOrmOptions } from './infrastructure/orm/datasource';
+import { createTypeOrmOptions } from './infrastructure/orm/typeorm-util';
 
 @Module({
   imports: [
     ConfigModule.forRoot({
       load: [appConfig],
-      envFilePath: ['.env', '.env.development'],
+      envFilePath: ['.env'],
     }),
     TypeOrmModule.forRootAsync({
       imports: [ConfigModule],
