@@ -1,0 +1,12 @@
+# node_modulesは通常、大きく、ローカルの開発環境に依存する可能性があるため無視
+node_modules/
+
+# git関連のファイルを無視
+.git/
+.gitignore
+
+# ログファイルや一時ファイルを無視
+*.log
+*.tmp
+
+.env
