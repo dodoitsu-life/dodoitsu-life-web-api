@@ -22,7 +22,7 @@ export class DodoitsuService {
     return this.findDodoitsu(page, limit, { likes: 'DESC' });
   }
 
-  async findOne(id): Promise<Dodoitsu | null> {
+  async findOne(id: string): Promise<Dodoitsu | null> {
     const dodoitsu = await this.dodoitsuRepository.findOne(id);
     if (!dodoitsu) {
       throw new NotFoundException(`Dodoitsu with ID ${id} not found`);
@@ -35,13 +35,13 @@ export class DodoitsuService {
     return this.dodoitsuRepository.save(dodoitsu);
   }
 
-  async increaseLike(id: number): Promise<Dodoitsu> {
+  async increaseLike(id: string): Promise<Dodoitsu> {
     const dodoitsu = await this.findOne(id);
     dodoitsu.likes += 1;
     return await this.dodoitsuRepository.save(dodoitsu);
   }
 
-  async decreaseLike(id: number): Promise<Dodoitsu> {
+  async decreaseLike(id: string): Promise<Dodoitsu> {
     const dodoitsu = await this.findOne(id);
     if (dodoitsu.likes > 0) {
       dodoitsu.likes -= 1;

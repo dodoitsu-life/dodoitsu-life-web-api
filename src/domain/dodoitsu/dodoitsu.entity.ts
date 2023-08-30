@@ -1,9 +1,10 @@
-import { Entity, PrimaryGeneratedColumn, Column } from 'typeorm';
+import { Entity, PrimaryColumn, Column } from 'typeorm';
+import { v4 as uuidv4 } from 'uuid';
 
 @Entity()
 export class Dodoitsu {
-  @PrimaryGeneratedColumn()
-  public id: number;
+  @PrimaryColumn('uuid')
+  id: string = uuidv4();
 
   @Column()
   content: string;

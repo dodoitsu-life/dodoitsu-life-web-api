@@ -19,7 +19,7 @@ export class DodoitsuRepository implements IDodoitsuRepository {
     return await this.entityManager.find(Dodoitsu, options);
   }
 
-  async findOne(id: number): Promise<Dodoitsu> {
+  async findOne(id: string): Promise<Dodoitsu> {
     return await this.entityManager.findOne(Dodoitsu, {
       where: { id },
     });

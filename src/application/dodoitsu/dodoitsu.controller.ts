@@ -49,7 +49,7 @@ export class DodoitsuController {
   @Get(':id')
   @HttpCode(HttpStatus.OK)
   async findOne(
-    @Param('id') id: number,
+    @Param('id') id: string,
   ): Promise<ApiResponse<Dodoitsu | null>> {
     const dodoitsu = await this.dodoitsuService.findOne(id);
     return ApiResponse.success(dodoitsu);
@@ -67,7 +67,7 @@ export class DodoitsuController {
   @Post(':id/like')
   @HttpCode(HttpStatus.CREATED)
   async addLike(
-    @Param('id', ParseIntPipe) id: number,
+    @Param('id', ParseIntPipe) id: string,
   ): Promise<ApiResponse<void>> {
     await this.dodoitsuService.increaseLike(id);
     return ApiResponse.success(null, undefined, 'Like added successfully');
@@ -76,7 +76,7 @@ export class DodoitsuController {
   @Delete(':id/like')
   @HttpCode(HttpStatus.OK)
   async removeLike(
-    @Param('id', ParseIntPipe) id: number,
+    @Param('id', ParseIntPipe) id: string,
   ): Promise<ApiResponse<void>> {
     await this.dodoitsuService.decreaseLike(id);
     return ApiResponse.success(null, undefined, 'Like removed successfully');

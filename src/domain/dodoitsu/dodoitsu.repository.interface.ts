@@ -11,7 +11,7 @@ export interface FindOptions {
 
 export interface IDodoitsuRepository {
   find(options: FindOptions): Promise<Dodoitsu[]>;
-  findOne(id: number): Promise<Dodoitsu | null>;
+  findOne(id: string): Promise<Dodoitsu | null>;
   count(): Promise<number>;
   create(dodoitsu: CreateDodoitsuDto): Promise<Dodoitsu>;
   save(dodoitsu: Dodoitsu): Promise<Dodoitsu>;
