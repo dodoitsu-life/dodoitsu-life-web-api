@@ -27,7 +27,7 @@ export class AuthService {
 
     userEntity.twitterId = user.twitterId;
     userEntity.name = user.name;
-    userEntity.photo = user.photo;
+    userEntity.photo = user.photo.replace('_normal', '');
 
     const existingUser = await this.userService.findOne({
       twitterId: userEntity.twitterId,
