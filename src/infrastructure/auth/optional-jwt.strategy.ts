@@ -1,17 +1,20 @@
-import { Injectable, UnauthorizedException } from '@nestjs/common';
+import { Injectable } from '@nestjs/common';
 import { PassportStrategy } from '@nestjs/passport';
 import { ConfigService } from '@nestjs/config';
 import { ExtractJwt, Strategy } from 'passport-jwt';
 
+import { User } from '@domain/user/user.entity';
 import { UserService } from '@domain/user/user.service';
-import { ResponseUserDto } from '@application/user/dto/response-user.dto';
 
 export interface JwtPayload {
   userId: string;
 }
 
 @Injectable()
-export class JwtStrategy extends PassportStrategy(Strategy, 'jwt') {
+export class OptionalJwtStrategy extends PassportStrategy(
+  Strategy,
+  'jwt-optional',
+) {
   constructor(
     private readonly userService: UserService,
     private readonly configService: ConfigService,
@@ -23,13 +26,14 @@ export class JwtStrategy extends PassportStrategy(Strategy, 'jwt') {
     });
   }
 
-  async validate(payload: JwtPayload): Promise<ResponseUserDto> {
+  async validate(payload: JwtPayload | undefined): Promise<User | undefined> {
+    if (!payload) {
+      return undefined;
+    }
     const user = await this.userService.findOne({ id: payload.userId });
     if (!user) {
-      throw new UnauthorizedException('User does not exist');
+      return undefined;
     }
-
-    const responseMeDto = new ResponseUserDto(user);
-    return responseMeDto;
+    return user;
   }
 }
