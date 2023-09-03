@@ -1,12 +1,15 @@
 import { Module } from '@nestjs/common';
 import { APP_FILTER } from '@nestjs/core';
-import { NestHttpExceptionFilter } from './common/exception-filter/ExceptionFilter';
 import { ConfigModule, ConfigService } from '@nestjs/config';
 import { TypeOrmModule } from '@nestjs/typeorm';
-import { DodoitsuModule } from './application/dodoitsu/dodoitsu.module';
-import { AuthModule } from './application/auth/auth.module';
-import { appConfig } from './config/app.config';
-import { createTypeOrmOptions } from './infrastructure/orm/typeorm-util';
+
+import { appConfig } from '@config/app.config';
+import { NestHttpExceptionFilter } from '@common/exception-filter/ExceptionFilter';
+
+import { DodoitsuModule } from '@application/dodoitsu/dodoitsu.module';
+import { AuthModule } from '@application/auth/auth.module';
+
+import { createTypeOrmOptions } from '@infrastructure/orm/typeorm-util';
 
 @Module({
   imports: [

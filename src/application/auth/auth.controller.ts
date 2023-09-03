@@ -6,13 +6,18 @@ import {
   Body,
   Res,
   UseGuards,
+  HttpCode,
+  HttpStatus,
 } from '@nestjs/common';
 import { AuthGuard } from '@nestjs/passport';
-import { AuthService } from '../../domain/auth/auth.service';
 import { ConfigService } from '@nestjs/config';
-import { ApiResponse } from 'src/common/ApiResponse';
-import { UserService } from 'src/domain/user/user.service';
-import { TokenRefreshDto } from './dto/token-refresh.dto';
+
+import { AuthService } from '@domain/auth/auth.service';
+import { UserService } from '@domain/user/user.service';
+
+import { ApiResponse } from '@common/ApiResponse';
+
+import { TokenRefreshDto } from '@application/auth/dto/token-refresh.dto';
 
 @Controller('auth')
 export class AuthController {
@@ -23,10 +28,12 @@ export class AuthController {
   ) {}
 
   @UseGuards(AuthGuard('twitter'))
+  @HttpCode(HttpStatus.OK)
   @Get('twitter')
   async signInWithTwitter() {}
 
   @UseGuards(AuthGuard('twitter'))
+  @HttpCode(HttpStatus.OK)
   @Get('twitter/callback')
   async signInWithTwitterRedirect(@Req() req, @Res() res) {
     const user = await this.authService.handleCallback(req);
@@ -39,17 +46,19 @@ export class AuthController {
   }
 
   @Post('refresh-token')
+  @HttpCode(HttpStatus.OK)
   async refreshToken(@Body() body: TokenRefreshDto) {
     const user = await this.authService.handleRefreshToken(body.refreshToken);
+    if (!user) throw Error('User not found');
     const tokens = await this.authService.generateTokens(user);
     return tokens;
   }
 
   @UseGuards(AuthGuard('jwt'))
+  @HttpCode(HttpStatus.OK)
   @Get('me')
   async getProfile(@Req() req) {
-    const user = await this.userService.findOne({ id: req.user.userId });
-    return ApiResponse.success(user);
+    return ApiResponse.success(req.user);
   }
 
   @Post('logout')

@@ -1,7 +1,9 @@
 import { ConfigService } from '@nestjs/config';
 import { TypeOrmModuleOptions } from '@nestjs/typeorm';
-import { Dodoitsu } from '../../domain/dodoitsu/dodoitsu.entity';
-import { User } from 'src/domain/user/user.entity';
+
+import { Dodoitsu } from '@domain/dodoitsu/dodoitsu.entity';
+import { User } from '@domain/user/user.entity';
+
 export const createTypeOrmOptions = async (
   configService: ConfigService,
 ): Promise<TypeOrmModuleOptions> => {
