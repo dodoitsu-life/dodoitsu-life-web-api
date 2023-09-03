@@ -1,4 +1,6 @@
-import 'dotenv/config';
+if (process.env.NODE_ENV !== 'production') {
+  import('dotenv/config');
+}
 import { DataSource } from 'typeorm';
 
 const AppDataSource = new DataSource({
