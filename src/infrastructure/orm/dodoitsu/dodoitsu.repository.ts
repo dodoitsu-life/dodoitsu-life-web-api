@@ -1,12 +1,16 @@
 import { Injectable } from '@nestjs/common';
+import { InjectEntityManager } from '@nestjs/typeorm';
 import { EntityManager } from 'typeorm';
+
 import {
   IDodoitsuRepository,
   FindOptions,
-} from '../../../domain/dodoitsu/dodoitsu.repository.interface';
-import { InjectEntityManager } from '@nestjs/typeorm';
-import { Dodoitsu } from '../../../domain/dodoitsu/dodoitsu.entity';
-import { CreateDodoitsuDto } from '../../../application/dodoitsu/dto/create-dodoitsu.dto';
+} from '@domain/dodoitsu/dodoitsu.repository.interface';
+import { Dodoitsu } from '@domain/dodoitsu/dodoitsu.entity';
+import { ResponseDodoitsuDto } from '@application/dodoitsu/dto/response-dodoitsu.dto';
+
+import { User } from '@domain/user/user.entity';
+import { CreateDodoitsuDto } from '@application/dodoitsu/dto/create-dodoitsu.dto';
 
 @Injectable()
 export class DodoitsuRepository implements IDodoitsuRepository {
@@ -15,28 +19,42 @@ export class DodoitsuRepository implements IDodoitsuRepository {
     private readonly entityManager: EntityManager,
   ) {}
 
-  async find(options: FindOptions): Promise<Dodoitsu[]> {
-    return await this.entityManager.find(Dodoitsu, options);
+  async find(options: FindOptions): Promise<ResponseDodoitsuDto[]> {
+    const dodoitsus = await this.entityManager.find(Dodoitsu, {
+      ...options,
+      relations: ['author'],
+    });
+    return dodoitsus.map((dodoitsu) => new ResponseDodoitsuDto(dodoitsu));
   }
 
-  async findOne(id: string): Promise<Dodoitsu> {
-    return await this.entityManager.findOne(Dodoitsu, {
+  async findOne(id: string): Promise<ResponseDodoitsuDto> {
+    const dodoitsu = await this.entityManager.findOne(Dodoitsu, {
       where: { id },
+      relations: ['author'],
     });
+    return new ResponseDodoitsuDto(dodoitsu);
   }
 
   async count(): Promise<number> {
     return await this.entityManager.count(Dodoitsu);
   }
 
-  async create(createDodoitsuDto: CreateDodoitsuDto): Promise<Dodoitsu> {
+  async create(
+    createDodoitsuDto: CreateDodoitsuDto,
+    author?: User,
+  ): Promise<Dodoitsu> {
     const dodoitsu = new Dodoitsu();
     dodoitsu.content = createDodoitsuDto.content;
     dodoitsu.description = createDodoitsuDto.description;
+    if (author) {
+      dodoitsu.author = author;
+    }
     return await dodoitsu;
   }
 
-  async save(dodoitsu: Dodoitsu): Promise<Dodoitsu> {
-    return await this.entityManager.save(dodoitsu);
+  async save(dodoitsu: Dodoitsu): Promise<ResponseDodoitsuDto> {
+    const newDodoitsu = await this.entityManager.save(dodoitsu);
+    console.log(newDodoitsu);
+    return new ResponseDodoitsuDto(newDodoitsu);
   }
 }

@@ -1,5 +1,6 @@
-import { Entity, PrimaryColumn, Column } from 'typeorm';
+import { Entity, PrimaryColumn, Column, ManyToOne, JoinColumn } from 'typeorm';
 import { v4 as uuidv4 } from 'uuid';
+import { User } from '@domain/user/user.entity';
 
 @Entity()
 export class Dodoitsu {
@@ -12,8 +13,9 @@ export class Dodoitsu {
   @Column({ nullable: true })
   description: string;
 
-  @Column({ default: 0 })
-  likes: number;
+  @ManyToOne(() => User, { nullable: true })
+  @JoinColumn({ name: 'authorId' })
+  author?: User;
 
   @Column({ type: 'timestamp', default: () => 'CURRENT_TIMESTAMP' })
   createdAt;
