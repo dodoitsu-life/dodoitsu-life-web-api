@@ -1,6 +1,7 @@
-if (process.env.NODE_ENV !== 'production') {
-  import('dotenv/config');
+if (process.env.DODOITSULIFE_ENV !== 'production') {
+  require('dotenv/config');
 }
+console.log(process.env.NODE_ENV);
 import { DataSource } from 'typeorm';
 
 const AppDataSource = new DataSource({
