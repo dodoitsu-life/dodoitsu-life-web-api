@@ -1,4 +1,5 @@
 import {
+  Req,
   Body,
   Controller,
   Get,
@@ -7,14 +8,17 @@ import {
   Param,
   Query,
   Post,
-  Delete,
   DefaultValuePipe,
   ParseIntPipe,
+  UseGuards,
 } from '@nestjs/common';
-import { DodoitsuService } from '../../domain/dodoitsu/dodoitsu.service';
-import { CreateDodoitsuDto } from './dto/create-dodoitsu.dto';
-import { Dodoitsu } from '../../domain/dodoitsu/dodoitsu.entity';
-import { ApiResponse } from '../../common/ApiResponse';
+import { ApiResponse } from '@common/ApiResponse';
+
+import { DodoitsuService } from '@domain/dodoitsu/dodoitsu.service';
+import { CreateDodoitsuDto } from '@application/dodoitsu/dto/create-dodoitsu.dto';
+import { ResponseDodoitsuDto } from '@application/dodoitsu/dto/response-dodoitsu.dto';
+
+import { OptionalJwtAuthGuard } from '@application/auth/guards/optional-jwt-auth.guard';
 
 @Controller('dodoitsu')
 export class DodoitsuController {
@@ -25,7 +29,7 @@ export class DodoitsuController {
   async findLatest(
     @Query('page', new DefaultValuePipe(1), ParseIntPipe) page: number,
     @Query('limit', new DefaultValuePipe(10), ParseIntPipe) limit: number,
-  ): Promise<ApiResponse<Dodoitsu[]>> {
+  ): Promise<ApiResponse<ResponseDodoitsuDto[]>> {
     const [dodoitsuList, allCount] = await Promise.all([
       this.dodoitsuService.findLatest(page, limit),
       this.dodoitsuService.countAll(),
@@ -38,7 +42,7 @@ export class DodoitsuController {
   async findPopular(
     @Query('page', new DefaultValuePipe(1), ParseIntPipe) page: number,
     @Query('limit', new DefaultValuePipe(10), ParseIntPipe) limit: number,
-  ): Promise<ApiResponse<Dodoitsu[]>> {
+  ): Promise<ApiResponse<ResponseDodoitsuDto[]>> {
     const [dodoitsuList, allCount] = await Promise.all([
       this.dodoitsuService.findPopular(page, limit),
       this.dodoitsuService.countAll(),
@@ -50,35 +54,22 @@ export class DodoitsuController {
   @HttpCode(HttpStatus.OK)
   async findOne(
     @Param('id') id: string,
-  ): Promise<ApiResponse<Dodoitsu | null>> {
+  ): Promise<ApiResponse<ResponseDodoitsuDto | null>> {
     const dodoitsu = await this.dodoitsuService.findOne(id);
     return ApiResponse.success(dodoitsu);
   }
 
+  @UseGuards(OptionalJwtAuthGuard)
   @Post()
   @HttpCode(HttpStatus.OK)
   async create(
+    @Req() req,
     @Body() createDodoitsuDto: CreateDodoitsuDto,
-  ): Promise<ApiResponse<Dodoitsu>> {
-    const dodoitsu = await this.dodoitsuService.create(createDodoitsuDto);
+  ): Promise<ApiResponse<ResponseDodoitsuDto>> {
+    const dodoitsu = await this.dodoitsuService.create(
+      createDodoitsuDto,
+      req.user,
+    );
     return ApiResponse.success(dodoitsu);
-  }
-
-  @Post(':id/like')
-  @HttpCode(HttpStatus.CREATED)
-  async addLike(
-    @Param('id', ParseIntPipe) id: string,
-  ): Promise<ApiResponse<void>> {
-    await this.dodoitsuService.increaseLike(id);
-    return ApiResponse.success(null, undefined, 'Like added successfully');
-  }
-
-  @Delete(':id/like')
-  @HttpCode(HttpStatus.OK)
-  async removeLike(
-    @Param('id', ParseIntPipe) id: string,
-  ): Promise<ApiResponse<void>> {
-    await this.dodoitsuService.decreaseLike(id);
-    return ApiResponse.success(null, undefined, 'Like removed successfully');
   }
 }

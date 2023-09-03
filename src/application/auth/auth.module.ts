@@ -1,18 +1,20 @@
 import { Module } from '@nestjs/common';
 import { TypeOrmModule } from '@nestjs/typeorm';
-import { AuthService } from '../../domain/auth/auth.service';
-import { AuthController } from './auth.controller';
-import { UserService } from '../../domain/user/user.service';
-import { UserModule } from '../user/user.module';
 import { PassportModule } from '@nestjs/passport';
-import { TwitterStrategy } from 'src/infrastructure/auth/twitter.strategy';
-import { User } from 'src/domain/user/user.entity';
-import { SYMBOL as USERSYMBOL } from '../../domain/user/user.repository.interface';
-import { UserRepository } from 'src/infrastructure/orm/user/user.repository';
 import { ConfigModule } from '@nestjs/config';
-import { JwtStrategy } from 'src/infrastructure/auth/jwt.strategy';
 import { JwtModule, JwtService } from '@nestjs/jwt';
-import { ConfigService } from '@nestjs/config';
+
+import { AuthService } from '@domain/auth/auth.service';
+import { UserService } from '@domain/user/user.service';
+import { User } from '@domain/user/user.entity';
+import { SYMBOL as USERSYMBOL } from '@domain/user/user.repository.interface';
+
+import { AuthController } from '@application/auth/auth.controller';
+import { UserModule } from '@application/user/user.module';
+
+import { TwitterStrategy } from '@infrastructure/auth/twitter.strategy';
+import { JwtStrategy } from '@infrastructure/auth/jwt.strategy';
+import { UserRepository } from '@infrastructure/orm/user/user.repository';
 
 @Module({
   imports: [

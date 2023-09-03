@@ -1,4 +1,4 @@
-import { User } from '../user/user.entity';
+import { User } from '@domain/user/user.entity';
 
 export const SYMBOL = Symbol('IAuthRepository');
 

@@ -1,13 +1,16 @@
-import { Injectable, Inject } from '@nestjs/common';
+import { Injectable, Inject, UnauthorizedException } from '@nestjs/common';
 import { JwtService } from '@nestjs/jwt';
-import { UserService } from '../user/user.service';
-import { User } from '../user/user.entity';
-import { TwitterUserPayload } from '../../infrastructure/auth/twitter.strategy';
-import { JwtPayload } from 'src/infrastructure/auth/jwt.strategy';
 import { ConfigService } from '@nestjs/config';
-import { IUserRepository, SYMBOL } from '../user/user.repository.interface';
 import { v4 as uuidv4 } from 'uuid';
-import { UnauthorizedException } from '@nestjs/common';
+
+import { UserService } from '@domain/user/user.service';
+import { User } from '@domain/user/user.entity';
+import {
+  IUserRepository,
+  SYMBOL,
+} from '@domain/user/user.repository.interface';
+import { TwitterUserPayload } from '@infrastructure/auth/twitter.strategy';
+import { JwtPayload } from '@infrastructure/auth/jwt.strategy';
 
 type UserPayload = TwitterUserPayload;
 

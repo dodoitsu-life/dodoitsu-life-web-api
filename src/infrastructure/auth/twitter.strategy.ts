@@ -20,8 +20,8 @@ export class TwitterStrategy extends PassportStrategy(Strategy, 'twitter') {
   }
 
   async validate(
-    accessToken: string,
-    refreshToken: string,
+    _,
+    __,
     profile: any,
     done: (err: any, user: TwitterUserPayload, info?: any) => void,
   ): Promise<any> {

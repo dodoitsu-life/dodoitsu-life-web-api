@@ -1,28 +1,43 @@
 import { Injectable, Inject, NotFoundException } from '@nestjs/common';
-import { IDodoitsuRepository, SYMBOL } from './dodoitsu.repository.interface';
-import { Dodoitsu } from './dodoitsu.entity';
-import { CreateDodoitsuDto } from '../../application/dodoitsu/dto/create-dodoitsu.dto';
+
+import {
+  IDodoitsuRepository,
+  SYMBOL,
+} from '@domain/dodoitsu/dodoitsu.repository.interface';
+import { Dodoitsu } from '@domain/dodoitsu/dodoitsu.entity';
+import { CreateDodoitsuDto } from '@application/dodoitsu/dto/create-dodoitsu.dto';
+import { ResponseDodoitsuDto } from '@application/dodoitsu/dto/response-dodoitsu.dto';
+
+import { UserService } from '@domain/user/user.service';
+import { User } from '@domain/user/user.entity';
 
 @Injectable()
 export class DodoitsuService {
   constructor(
     @Inject(SYMBOL)
     private readonly dodoitsuRepository: IDodoitsuRepository,
+    private readonly userService: UserService,
   ) {}
 
   async countAll(): Promise<number> {
     return this.dodoitsuRepository.count();
   }
 
-  async findLatest(page: number, limit: number): Promise<Dodoitsu[]> {
+  async findLatest(
+    page: number,
+    limit: number,
+  ): Promise<ResponseDodoitsuDto[]> {
     return this.findDodoitsu(page, limit, { createdAt: 'DESC' });
   }
 
-  async findPopular(page: number, limit: number): Promise<Dodoitsu[]> {
-    return this.findDodoitsu(page, limit, { likes: 'DESC' });
+  async findPopular(
+    page: number,
+    limit: number,
+  ): Promise<ResponseDodoitsuDto[]> {
+    return this.findDodoitsu(page, limit, { createdAt: 'ASC' });
   }
 
-  async findOne(id: string): Promise<Dodoitsu | null> {
+  async findOne(id: string): Promise<ResponseDodoitsuDto | null> {
     const dodoitsu = await this.dodoitsuRepository.findOne(id);
     if (!dodoitsu) {
       throw new NotFoundException(`Dodoitsu with ID ${id} not found`);
@@ -30,31 +45,22 @@ export class DodoitsuService {
     return dodoitsu;
   }
 
-  async create(createDodoitsuDto: CreateDodoitsuDto): Promise<Dodoitsu> {
-    const dodoitsu = await this.dodoitsuRepository.create(createDodoitsuDto);
+  async create(
+    createDodoitsuDto: CreateDodoitsuDto,
+    user?: User,
+  ): Promise<ResponseDodoitsuDto> {
+    const dodoitsu = await this.dodoitsuRepository.create(
+      createDodoitsuDto,
+      user,
+    );
     return this.dodoitsuRepository.save(dodoitsu);
-  }
-
-  async increaseLike(id: string): Promise<Dodoitsu> {
-    const dodoitsu = await this.findOne(id);
-    dodoitsu.likes += 1;
-    return await this.dodoitsuRepository.save(dodoitsu);
-  }
-
-  async decreaseLike(id: string): Promise<Dodoitsu> {
-    const dodoitsu = await this.findOne(id);
-    if (dodoitsu.likes > 0) {
-      dodoitsu.likes -= 1;
-    }
-
-    return await this.dodoitsuRepository.save(dodoitsu);
   }
 
   private async findDodoitsu(
     page: number,
     limit: number,
     order: { [P in keyof Dodoitsu]?: 'ASC' | 'DESC' },
-  ): Promise<Dodoitsu[]> {
+  ): Promise<ResponseDodoitsuDto[]> {
     const totalCount = await this.dodoitsuRepository.count();
     const totalPages = Math.ceil(totalCount / limit);
 
