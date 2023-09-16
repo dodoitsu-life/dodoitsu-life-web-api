@@ -19,7 +19,7 @@ export class NestHttpExceptionFilter implements ExceptionFilter {
     );
 
     errorResponse = this.handleNestError(error, errorResponse);
-    response.json(errorResponse);
+    response.status(errorResponse.code).json(errorResponse);
   }
 
   private handleNestError(
