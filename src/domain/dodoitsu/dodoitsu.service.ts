@@ -1,14 +1,18 @@
-import { Injectable, Inject, NotFoundException } from '@nestjs/common';
+import {
+  Inject,
+  Injectable,
+  NotFoundException,
+  ConflictException,
+} from '@nestjs/common';
 
 import {
   IDodoitsuRepository,
   SYMBOL,
 } from '@domain/dodoitsu/dodoitsu.repository.interface';
-import { Dodoitsu } from '@domain/dodoitsu/dodoitsu.entity';
 import { CreateDodoitsuDto } from '@application/dodoitsu/dto/create-dodoitsu.dto';
-import { ResponseDodoitsuDto } from '@application/dodoitsu/dto/response-dodoitsu.dto';
+import { Dodoitsu } from '@domain/dodoitsu/dodoitsu.entity';
+import { DodoitsuLike } from '@domain/dodoitsu/dodoitsu-like.entity';
 
-import { UserService } from '@domain/user/user.service';
 import { User } from '@domain/user/user.entity';
 
 @Injectable()
@@ -16,28 +20,21 @@ export class DodoitsuService {
   constructor(
     @Inject(SYMBOL)
     private readonly dodoitsuRepository: IDodoitsuRepository,
-    private readonly userService: UserService,
   ) {}
 
   async countAll(): Promise<number> {
     return this.dodoitsuRepository.count();
   }
 
-  async findLatest(
-    page: number,
-    limit: number,
-  ): Promise<ResponseDodoitsuDto[]> {
-    return this.findDodoitsu(page, limit, { createdAt: 'DESC' });
+  async findLatest(page: number, limit: number): Promise<Dodoitsu[]> {
+    return this.findDodoitsuByOrder(page, limit, { createdAt: 'DESC' });
   }
 
-  async findPopular(
-    page: number,
-    limit: number,
-  ): Promise<ResponseDodoitsuDto[]> {
-    return this.findDodoitsu(page, limit, { createdAt: 'ASC' });
+  async findPopular(page: number, limit: number): Promise<Dodoitsu[]> {
+    return this.findDodoitsuByOrder(page, limit, { createdAt: 'ASC' });
   }
 
-  async findOne(id: string): Promise<ResponseDodoitsuDto | null> {
+  async findOne(id: string): Promise<Dodoitsu | null> {
     const dodoitsu = await this.dodoitsuRepository.findOne(id);
     if (!dodoitsu) {
       throw new NotFoundException(`Dodoitsu with ID ${id} not found`);
@@ -45,22 +42,16 @@ export class DodoitsuService {
     return dodoitsu;
   }
 
-  async create(
-    createDodoitsuDto: CreateDodoitsuDto,
-    user?: User,
-  ): Promise<ResponseDodoitsuDto> {
-    const dodoitsu = await this.dodoitsuRepository.create(
-      createDodoitsuDto,
-      user,
-    );
+  async create(dto: CreateDodoitsuDto, user?: User): Promise<Dodoitsu> {
+    const dodoitsu = await this.dodoitsuRepository.create(dto, user);
     return this.dodoitsuRepository.save(dodoitsu);
   }
 
-  private async findDodoitsu(
+  private async findDodoitsuByOrder(
     page: number,
     limit: number,
     order: { [P in keyof Dodoitsu]?: 'ASC' | 'DESC' },
-  ): Promise<ResponseDodoitsuDto[]> {
+  ): Promise<Dodoitsu[]> {
     const totalCount = await this.dodoitsuRepository.count();
     const totalPages = Math.ceil(totalCount / limit);
 
@@ -75,5 +66,34 @@ export class DodoitsuService {
       take: limit,
       skip: (page - 1) * limit,
     });
+  }
+
+  async likeDodoitsu(dodoitsuId: string, user: User): Promise<void> {
+    const dodoitsu = await this.findOne(dodoitsuId);
+
+    if (dodoitsu.likes.some((like) => like.user.id === user.id)) {
+      throw new ConflictException('User already liked this Dodoitsu.');
+    }
+
+    const newLike = new DodoitsuLike();
+    newLike.user = user;
+    newLike.dodoitsu = dodoitsu;
+
+    dodoitsu.likes.push(newLike);
+    await this.dodoitsuRepository.save(dodoitsu); // Assuming that cascade options are set to save related entities
+  }
+
+  async unlikeDodoitsu(dodoitsuId: string, user: User): Promise<void> {
+    const dodoitsu = await this.findOne(dodoitsuId);
+
+    const likeIndex = dodoitsu.likes.findIndex(
+      (like) => like.user.id === user.id,
+    );
+    if (likeIndex === -1) {
+      throw new NotFoundException('User has not liked this Dodoitsu yet.');
+    }
+
+    dodoitsu.likes.splice(likeIndex, 1);
+    await this.dodoitsuRepository.save(dodoitsu); // Again, assuming cascade options are set
   }
 }

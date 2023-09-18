@@ -7,7 +7,7 @@ import {
   FindOptions,
 } from '@domain/dodoitsu/dodoitsu.repository.interface';
 import { Dodoitsu } from '@domain/dodoitsu/dodoitsu.entity';
-import { ResponseDodoitsuDto } from '@application/dodoitsu/dto/response-dodoitsu.dto';
+import { DodoitsuLike } from '@domain/dodoitsu/dodoitsu-like.entity';
 
 import { User } from '@domain/user/user.entity';
 import { CreateDodoitsuDto } from '@application/dodoitsu/dto/create-dodoitsu.dto';
@@ -19,20 +19,20 @@ export class DodoitsuRepository implements IDodoitsuRepository {
     private readonly entityManager: EntityManager,
   ) {}
 
-  async find(options: FindOptions): Promise<ResponseDodoitsuDto[]> {
+  async find(options: FindOptions): Promise<Dodoitsu[]> {
     const dodoitsus = await this.entityManager.find(Dodoitsu, {
       ...options,
-      relations: ['author'],
+      relations: ['author', 'likes'],
     });
-    return dodoitsus.map((dodoitsu) => new ResponseDodoitsuDto(dodoitsu));
+    return dodoitsus;
   }
 
-  async findOne(id: string): Promise<ResponseDodoitsuDto> {
+  async findOne(id: string): Promise<Dodoitsu> {
     const dodoitsu = await this.entityManager.findOne(Dodoitsu, {
       where: { id },
-      relations: ['author'],
+      relations: ['author', 'likes'],
     });
-    return new ResponseDodoitsuDto(dodoitsu);
+    return dodoitsu;
   }
 
   async count(): Promise<number> {
@@ -52,9 +52,24 @@ export class DodoitsuRepository implements IDodoitsuRepository {
     return await dodoitsu;
   }
 
-  async save(dodoitsu: Dodoitsu): Promise<ResponseDodoitsuDto> {
+  async save(dodoitsu: Dodoitsu): Promise<Dodoitsu> {
     const newDodoitsu = await this.entityManager.save(dodoitsu);
-    console.log(newDodoitsu);
-    return new ResponseDodoitsuDto(newDodoitsu);
+    return newDodoitsu;
+  }
+
+  async like(dodoitsu: Dodoitsu, user: User): Promise<void> {
+    const existingLike = await this.entityManager.findOne(DodoitsuLike, {
+      where: { dodoitsu, user },
+    });
+    if (!existingLike) {
+      const newLike = new DodoitsuLike();
+      newLike.dodoitsu = dodoitsu;
+      newLike.user = user;
+      await this.entityManager.save(DodoitsuLike, newLike);
+    }
+  }
+
+  async unlike(dodoitsu: Dodoitsu, user: User): Promise<void> {
+    await this.entityManager.delete(DodoitsuLike, { dodoitsu, user });
   }
 }

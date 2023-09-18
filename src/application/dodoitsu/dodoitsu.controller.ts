@@ -8,13 +8,15 @@ import {
   Param,
   Query,
   Post,
+  Delete,
   DefaultValuePipe,
   ParseIntPipe,
   UseGuards,
 } from '@nestjs/common';
+import { AuthGuard } from '@nestjs/passport';
 import { ApiResponse } from '@common/ApiResponse';
 
-import { DodoitsuService } from '@domain/dodoitsu/dodoitsu.service';
+import { DodoitsuApplicationService } from '@application/dodoitsu/dodoitsu.service';
 import { CreateDodoitsuDto } from '@application/dodoitsu/dto/create-dodoitsu.dto';
 import { ResponseDodoitsuDto } from '@application/dodoitsu/dto/response-dodoitsu.dto';
 
@@ -22,40 +24,55 @@ import { OptionalJwtAuthGuard } from '@application/auth/guards/optional-jwt-auth
 
 @Controller('dodoitsu')
 export class DodoitsuController {
-  constructor(private readonly dodoitsuService: DodoitsuService) {}
+  constructor(
+    private readonly dodoitsuApplicationService: DodoitsuApplicationService,
+  ) {}
 
+  @UseGuards(OptionalJwtAuthGuard)
   @Get('latest')
   @HttpCode(HttpStatus.OK)
   async findLatest(
+    @Req() req,
     @Query('page', new DefaultValuePipe(1), ParseIntPipe) page: number,
     @Query('limit', new DefaultValuePipe(10), ParseIntPipe) limit: number,
   ): Promise<ApiResponse<ResponseDodoitsuDto[]>> {
     const [dodoitsuList, allCount] = await Promise.all([
-      this.dodoitsuService.findLatest(page, limit),
-      this.dodoitsuService.countAll(),
+      this.dodoitsuApplicationService.findLatestDodoitsu(page, limit, req.user),
+      this.dodoitsuApplicationService.countAllDodoitsu(),
     ]);
     return ApiResponse.success(dodoitsuList, allCount);
   }
 
+  @UseGuards(OptionalJwtAuthGuard)
   @Get('popular')
   @HttpCode(HttpStatus.OK)
   async findPopular(
+    @Req() req,
     @Query('page', new DefaultValuePipe(1), ParseIntPipe) page: number,
     @Query('limit', new DefaultValuePipe(10), ParseIntPipe) limit: number,
   ): Promise<ApiResponse<ResponseDodoitsuDto[]>> {
     const [dodoitsuList, allCount] = await Promise.all([
-      this.dodoitsuService.findPopular(page, limit),
-      this.dodoitsuService.countAll(),
+      this.dodoitsuApplicationService.findPopularDodoitsu(
+        page,
+        limit,
+        req.user,
+      ),
+      this.dodoitsuApplicationService.countAllDodoitsu(),
     ]);
     return ApiResponse.success(dodoitsuList, allCount);
   }
 
+  @UseGuards(OptionalJwtAuthGuard)
   @Get(':id')
   @HttpCode(HttpStatus.OK)
   async findOne(
+    @Req() req,
     @Param('id') id: string,
   ): Promise<ApiResponse<ResponseDodoitsuDto | null>> {
-    const dodoitsu = await this.dodoitsuService.findOne(id);
+    const dodoitsu = await this.dodoitsuApplicationService.findOneDodoitsu(
+      id,
+      req.user,
+    );
     return ApiResponse.success(dodoitsu);
   }
 
@@ -66,10 +83,26 @@ export class DodoitsuController {
     @Req() req,
     @Body() createDodoitsuDto: CreateDodoitsuDto,
   ): Promise<ApiResponse<ResponseDodoitsuDto>> {
-    const dodoitsu = await this.dodoitsuService.create(
+    const dodoitsu = await this.dodoitsuApplicationService.createDodoitsu(
       createDodoitsuDto,
       req.user,
     );
     return ApiResponse.success(dodoitsu);
+  }
+
+  @UseGuards(AuthGuard('jwt')) // いいねは認証が必要
+  @Post(':id/like')
+  @HttpCode(HttpStatus.OK)
+  async like(@Param('id') id: string, @Req() req): Promise<ApiResponse<any>> {
+    await this.dodoitsuApplicationService.likeDodoitsu(id, req.user.id);
+    return ApiResponse.success(null);
+  }
+
+  @UseGuards(AuthGuard('jwt')) // いいね解除も認証が必要
+  @Delete(':id/unlike')
+  @HttpCode(HttpStatus.OK)
+  async unlike(@Param('id') id: string, @Req() req): Promise<ApiResponse<any>> {
+    await this.dodoitsuApplicationService.unlikeDodoitsu(id, req.user.id);
+    return ApiResponse.success(null);
   }
 }

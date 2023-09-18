@@ -1,6 +1,5 @@
 import { Dodoitsu } from '@domain/dodoitsu/dodoitsu.entity';
 import { CreateDodoitsuDto } from '@application/dodoitsu/dto/create-dodoitsu.dto';
-import { ResponseDodoitsuDto } from '@application/dodoitsu/dto/response-dodoitsu.dto';
 
 import { User } from '@domain/user/user.entity';
 
@@ -10,13 +9,16 @@ export interface FindOptions {
   };
   skip?: number;
   take?: number;
+  user?: User;
 }
 
 export interface IDodoitsuRepository {
-  find(options: FindOptions): Promise<ResponseDodoitsuDto[]>;
-  findOne(id: string): Promise<ResponseDodoitsuDto | null>;
+  find(options: FindOptions): Promise<Dodoitsu[]>;
+  findOne(id: string, user?: User): Promise<Dodoitsu | null>;
   count(): Promise<number>;
   create(dodoitsu: CreateDodoitsuDto, author?: User): Promise<Dodoitsu>;
-  save(dodoitsu: Dodoitsu): Promise<ResponseDodoitsuDto>;
+  save(dodoitsu: Dodoitsu): Promise<Dodoitsu>;
+  like(dodoitsu: Dodoitsu, user: User): Promise<void>;
+  unlike(dodoitsu: Dodoitsu, user: User): Promise<void>;
 }
 export const SYMBOL = Symbol('IDodoitsuRepository');
