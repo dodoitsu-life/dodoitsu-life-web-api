@@ -2,6 +2,7 @@ import { ConfigService } from '@nestjs/config';
 import { TypeOrmModuleOptions } from '@nestjs/typeorm';
 
 import { Dodoitsu } from '@domain/dodoitsu/dodoitsu.entity';
+import { DodoitsuLike } from '@/domain/dodoitsu/dodoitsu-like.entity';
 import { User } from '@domain/user/user.entity';
 
 export const createTypeOrmOptions = async (
@@ -24,7 +25,7 @@ export const createTypeOrmOptions = async (
     logging: configService.get('database.logging'),
     ssl,
     synchronize: configService.get('database.synchronize'),
-    entities: [Dodoitsu, User],
+    entities: [Dodoitsu, DodoitsuLike, User],
     migrations: ['dist/migration/*.js'],
   };
 };
