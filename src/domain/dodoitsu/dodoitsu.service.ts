@@ -1,9 +1,4 @@
-import {
-  Inject,
-  Injectable,
-  NotFoundException,
-  ConflictException,
-} from '@nestjs/common';
+import { Inject, Injectable, NotFoundException } from '@nestjs/common';
 
 import {
   IDodoitsuRepository,
@@ -11,7 +6,6 @@ import {
 } from '@domain/dodoitsu/dodoitsu.repository.interface';
 import { CreateDodoitsuDto } from '@application/dodoitsu/dto/create-dodoitsu.dto';
 import { Dodoitsu } from '@domain/dodoitsu/dodoitsu.entity';
-import { DodoitsuLike } from '@domain/dodoitsu/dodoitsu-like.entity';
 
 import { User } from '@domain/user/user.entity';
 
@@ -31,7 +25,21 @@ export class DodoitsuService {
   }
 
   async findPopular(page: number, limit: number): Promise<Dodoitsu[]> {
-    return this.findDodoitsuByOrder(page, limit, { createdAt: 'ASC' });
+    const totalCount = await this.dodoitsuRepository.count();
+    const totalPages = Math.ceil(totalCount / limit);
+
+    if (page > totalPages) {
+      throw new NotFoundException(
+        `Invalid page number. There are only ${totalPages} pages.`,
+      );
+    }
+    return this.dodoitsuRepository.findWithLikesOrder({
+      order: {
+        likes: 'DESC',
+      },
+      take: limit,
+      skip: (page - 1) * limit,
+    });
   }
 
   async findOne(id: string): Promise<Dodoitsu | null> {
@@ -45,6 +53,18 @@ export class DodoitsuService {
   async create(dto: CreateDodoitsuDto, user?: User): Promise<Dodoitsu> {
     const dodoitsu = await this.dodoitsuRepository.create(dto, user);
     return this.dodoitsuRepository.save(dodoitsu);
+  }
+
+  async likeDodoitsu(dodoitsu: Dodoitsu, user: User): Promise<void> {
+    return this.dodoitsuRepository.like(dodoitsu, user);
+  }
+
+  async unlikeDodoitsu(dodoitsu: Dodoitsu, user: User): Promise<void> {
+    return this.dodoitsuRepository.unlike(dodoitsu, user);
+  }
+
+  async didUserLike(dodoitsuId: string, userId: string): Promise<boolean> {
+    return this.dodoitsuRepository.didUserLike(dodoitsuId, userId);
   }
 
   private async findDodoitsuByOrder(
@@ -66,34 +86,5 @@ export class DodoitsuService {
       take: limit,
       skip: (page - 1) * limit,
     });
-  }
-
-  async likeDodoitsu(dodoitsuId: string, user: User): Promise<void> {
-    const dodoitsu = await this.findOne(dodoitsuId);
-
-    if (dodoitsu.likes.some((like) => like.user.id === user.id)) {
-      throw new ConflictException('User already liked this Dodoitsu.');
-    }
-
-    const newLike = new DodoitsuLike();
-    newLike.user = user;
-    newLike.dodoitsu = dodoitsu;
-
-    dodoitsu.likes.push(newLike);
-    await this.dodoitsuRepository.save(dodoitsu); // Assuming that cascade options are set to save related entities
-  }
-
-  async unlikeDodoitsu(dodoitsuId: string, user: User): Promise<void> {
-    const dodoitsu = await this.findOne(dodoitsuId);
-
-    const likeIndex = dodoitsu.likes.findIndex(
-      (like) => like.user.id === user.id,
-    );
-    if (likeIndex === -1) {
-      throw new NotFoundException('User has not liked this Dodoitsu yet.');
-    }
-
-    dodoitsu.likes.splice(likeIndex, 1);
-    await this.dodoitsuRepository.save(dodoitsu); // Again, assuming cascade options are set
   }
 }

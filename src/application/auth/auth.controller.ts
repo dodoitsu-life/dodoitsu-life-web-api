@@ -18,6 +18,7 @@ import { UserService } from '@domain/user/user.service';
 import { ApiResponse } from '@common/ApiResponse';
 
 import { TokenRefreshDto } from '@application/auth/dto/token-refresh.dto';
+import { ResponseUserDto } from '../user/dto/response-user.dto';
 
 @Controller('auth')
 export class AuthController {
@@ -58,7 +59,8 @@ export class AuthController {
   @HttpCode(HttpStatus.OK)
   @Get('me')
   async getProfile(@Req() req) {
-    return ApiResponse.success(req.user);
+    const user = new ResponseUserDto(req.user);
+    return ApiResponse.success(user);
   }
 
   @Post('logout')

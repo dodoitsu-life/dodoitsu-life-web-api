@@ -90,15 +90,14 @@ export class DodoitsuController {
     return ApiResponse.success(dodoitsu);
   }
 
-  @UseGuards(AuthGuard('jwt')) // いいねは認証が必要
+  @UseGuards(AuthGuard('jwt'))
   @Post(':id/like')
-  @HttpCode(HttpStatus.OK)
   async like(@Param('id') id: string, @Req() req): Promise<ApiResponse<any>> {
-    await this.dodoitsuApplicationService.likeDodoitsu(id, req.user.id);
+    await this.dodoitsuApplicationService.likeDodoitsu(id, req.user);
     return ApiResponse.success(null);
   }
 
-  @UseGuards(AuthGuard('jwt')) // いいね解除も認証が必要
+  @UseGuards(AuthGuard('jwt'))
   @Delete(':id/unlike')
   @HttpCode(HttpStatus.OK)
   async unlike(@Param('id') id: string, @Req() req): Promise<ApiResponse<any>> {

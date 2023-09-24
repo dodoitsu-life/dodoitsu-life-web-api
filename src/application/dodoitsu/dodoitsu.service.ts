@@ -22,11 +22,14 @@ export class DodoitsuApplicationService {
       limit,
     );
 
-    const responseDodoitsuList = dodoitsuList.map((dodoitsu) => {
-      const isLiked = dodoitsu.likes.some((like) => like.user.id === user.id);
-      return new ResponseDodoitsuDto(dodoitsu, isLiked);
-    });
-
+    const responseDodoitsuList = await Promise.all(
+      dodoitsuList.map(async (dodoitsu) => {
+        const isLiked = user
+          ? await this.dodoitsuDomainService.didUserLike(dodoitsu.id, user.id)
+          : false;
+        return new ResponseDodoitsuDto(dodoitsu, isLiked);
+      }),
+    );
     return responseDodoitsuList;
   }
 
@@ -40,11 +43,14 @@ export class DodoitsuApplicationService {
       limit,
     );
 
-    const responseDodoitsuList = dodoitsuList.map((dodoitsu) => {
-      const isLiked = dodoitsu.likes.some((like) => like.user.id === user?.id);
-      return new ResponseDodoitsuDto(dodoitsu, isLiked);
-    });
-
+    const responseDodoitsuList = await Promise.all(
+      dodoitsuList.map(async (dodoitsu) => {
+        const isLiked = user
+          ? await this.dodoitsuDomainService.didUserLike(dodoitsu.id, user.id)
+          : false;
+        return new ResponseDodoitsuDto(dodoitsu, isLiked);
+      }),
+    );
     return responseDodoitsuList;
   }
 
@@ -53,7 +59,9 @@ export class DodoitsuApplicationService {
     user?: User,
   ): Promise<ResponseDodoitsuDto | null> {
     const dodoitsu = await this.dodoitsuDomainService.findOne(id);
-    const isLiked = dodoitsu.likes.some((like) => like.user.id === user?.id);
+    const isLiked = user
+      ? await this.dodoitsuDomainService.didUserLike(id, user.id)
+      : false;
     return new ResponseDodoitsuDto(dodoitsu, isLiked);
   }
 
@@ -66,10 +74,16 @@ export class DodoitsuApplicationService {
   }
 
   async likeDodoitsu(id: string, user: User): Promise<void> {
-    return this.dodoitsuDomainService.likeDodoitsu(id, user);
+    const isLiked = await this.dodoitsuDomainService.didUserLike(id, user.id);
+    if (isLiked) {
+      throw new Error('Already liked');
+    }
+    const dodoitsu = await this.dodoitsuDomainService.findOne(id);
+    return this.dodoitsuDomainService.likeDodoitsu(dodoitsu, user);
   }
 
   async unlikeDodoitsu(id: string, user: User): Promise<void> {
-    return this.dodoitsuDomainService.unlikeDodoitsu(id, user);
+    const dodoitsu = await this.dodoitsuDomainService.findOne(id);
+    return this.dodoitsuDomainService.unlikeDodoitsu(dodoitsu, user);
   }
 }
