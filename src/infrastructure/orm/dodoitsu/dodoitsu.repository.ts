@@ -7,7 +7,7 @@ import {
   FindOptions,
 } from '@domain/dodoitsu/dodoitsu.repository.interface';
 import { Dodoitsu } from '@domain/dodoitsu/dodoitsu.entity';
-import { ResponseDodoitsuDto } from '@application/dodoitsu/dto/response-dodoitsu.dto';
+import { DodoitsuLike } from '@domain/dodoitsu/dodoitsu-like.entity';
 
 import { User } from '@domain/user/user.entity';
 import { CreateDodoitsuDto } from '@application/dodoitsu/dto/create-dodoitsu.dto';
@@ -19,20 +19,37 @@ export class DodoitsuRepository implements IDodoitsuRepository {
     private readonly entityManager: EntityManager,
   ) {}
 
-  async find(options: FindOptions): Promise<ResponseDodoitsuDto[]> {
-    const dodoitsus = await this.entityManager.find(Dodoitsu, {
+  async find(options: FindOptions): Promise<Dodoitsu[]> {
+    const dodoitsuList = await this.entityManager.find(Dodoitsu, {
       ...options,
-      relations: ['author'],
+      relations: ['author', 'likes'],
     });
-    return dodoitsus.map((dodoitsu) => new ResponseDodoitsuDto(dodoitsu));
+    return dodoitsuList;
   }
 
-  async findOne(id: string): Promise<ResponseDodoitsuDto> {
+  async findWithLikesOrder(options: FindOptions): Promise<Dodoitsu[]> {
+    const dodoitsuList = await this.entityManager
+      .getRepository(Dodoitsu)
+      .createQueryBuilder('dodoitsu')
+      .leftJoinAndSelect('dodoitsu.likes', 'dodoitsuLike')
+      .leftJoinAndSelect('dodoitsu.author', 'user')
+      .groupBy('dodoitsu.id, user.id, dodoitsuLike.id')
+      .addSelect('COUNT(dodoitsuLike.id)', 'likes_count')
+      .orderBy('likes_count', 'DESC')
+      .skip(options.skip)
+      .take(options.take)
+      .getMany();
+
+    return dodoitsuList;
+  }
+
+  async findOne(id: string): Promise<Dodoitsu> {
     const dodoitsu = await this.entityManager.findOne(Dodoitsu, {
       where: { id },
-      relations: ['author'],
+      relations: ['author', 'likes'],
     });
-    return new ResponseDodoitsuDto(dodoitsu);
+
+    return dodoitsu;
   }
 
   async count(): Promise<number> {
@@ -52,9 +69,30 @@ export class DodoitsuRepository implements IDodoitsuRepository {
     return await dodoitsu;
   }
 
-  async save(dodoitsu: Dodoitsu): Promise<ResponseDodoitsuDto> {
+  async save(dodoitsu: Dodoitsu): Promise<Dodoitsu> {
     const newDodoitsu = await this.entityManager.save(dodoitsu);
-    console.log(newDodoitsu);
-    return new ResponseDodoitsuDto(newDodoitsu);
+    return newDodoitsu;
+  }
+
+  like(dodoitsu: Dodoitsu, user: User): void {
+    const newLike = new DodoitsuLike();
+    newLike.dodoitsu = dodoitsu;
+    newLike.user = user;
+    this.entityManager.save(DodoitsuLike, newLike);
+  }
+
+  unlike(dodoitsu: Dodoitsu, user: User): void {
+    this.entityManager.delete(DodoitsuLike, { dodoitsu, user });
+  }
+
+  async didUserLike(dodoitsuId: string, userId: string): Promise<boolean> {
+    const like = await this.entityManager.findOne(DodoitsuLike, {
+      where: {
+        dodoitsu: { id: dodoitsuId },
+        user: { id: userId },
+      },
+    });
+
+    return !!like;
   }
 }

@@ -1,12 +1,14 @@
 if (process.env.DODOITSULIFE_ENV !== 'production') {
   require('dotenv/config');
 }
-console.log(process.env.NODE_ENV);
 import { DataSource } from 'typeorm';
 
 const AppDataSource = new DataSource({
   type: 'postgres',
-  host: process.env.DB_HOST || 'localhost',
+  host:
+    process.env.DODOITSULIFE_ENV === 'local'
+      ? 'localhost'
+      : process.env.DB_HOST || 'localhost',
   ssl:
     process.env.DODOITSULIFE_ENV === 'local'
       ? false

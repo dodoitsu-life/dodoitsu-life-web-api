@@ -7,7 +7,7 @@ import { JwtModule, JwtService } from '@nestjs/jwt';
 import { AuthService } from '@domain/auth/auth.service';
 import { UserService } from '@domain/user/user.service';
 import { User } from '@domain/user/user.entity';
-import { SYMBOL as USERSYMBOL } from '@domain/user/user.repository.interface';
+import { SYMBOL as USER_SYMBOL } from '@domain/user/user.repository.interface';
 
 import { AuthController } from '@application/auth/auth.controller';
 import { UserModule } from '@application/user/user.module';
@@ -32,7 +32,7 @@ import { UserRepository } from '@infrastructure/orm/user/user.repository';
     TwitterStrategy,
     JwtStrategy,
     {
-      provide: USERSYMBOL,
+      provide: USER_SYMBOL,
       useClass: UserRepository,
     },
   ],

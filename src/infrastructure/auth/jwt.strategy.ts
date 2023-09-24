@@ -4,7 +4,7 @@ import { ConfigService } from '@nestjs/config';
 import { ExtractJwt, Strategy } from 'passport-jwt';
 
 import { UserService } from '@domain/user/user.service';
-import { ResponseUserDto } from '@application/user/dto/response-user.dto';
+import { User } from '@domain/user/user.entity';
 
 export interface JwtPayload {
   userId: string;
@@ -18,18 +18,17 @@ export class JwtStrategy extends PassportStrategy(Strategy, 'jwt') {
   ) {
     super({
       jwtFromRequest: ExtractJwt.fromAuthHeaderAsBearerToken(),
-      ignoreExpiration: false,
+      ignoreExpiration: true,
       secretOrKey: configService.get<string>('auth.jwt.secret'),
     });
   }
 
-  async validate(payload: JwtPayload): Promise<ResponseUserDto> {
+  async validate(payload: JwtPayload): Promise<User> {
     const user = await this.userService.findOne({ id: payload.userId });
     if (!user) {
       throw new UnauthorizedException('User does not exist');
     }
 
-    const responseMeDto = new ResponseUserDto(user);
-    return responseMeDto;
+    return user;
   }
 }
