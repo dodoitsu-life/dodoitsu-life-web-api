@@ -26,7 +26,7 @@ export class Dodoitsu {
   author?: User;
 
   @OneToMany(() => DodoitsuLike, (like) => like.dodoitsu)
-  likes: DodoitsuLike[];
+  likes?: DodoitsuLike[];
 
   @Column({ type: 'timestamp', default: () => 'CURRENT_TIMESTAMP' })
   createdAt;

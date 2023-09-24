@@ -46,5 +46,6 @@ import { OptionalJwtStrategy } from '@infrastructure/auth/optional-jwt.strategy'
     JwtService,
     OptionalJwtStrategy,
   ],
+  exports: [PassportModule],
 })
 export class DodoitsuModule {}

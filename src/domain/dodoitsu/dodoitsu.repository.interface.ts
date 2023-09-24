@@ -9,16 +9,18 @@ export interface FindOptions {
   };
   skip?: number;
   take?: number;
-  user?: User;
+  orderDirection?: 'ASC' | 'DESC';
 }
 
 export interface IDodoitsuRepository {
   find(options: FindOptions): Promise<Dodoitsu[]>;
-  findOne(id: string, user?: User): Promise<Dodoitsu | null>;
+  findOne(id: string): Promise<Dodoitsu | null>;
+  findWithLikesOrder(options: FindOptions): Promise<Dodoitsu[]>;
   count(): Promise<number>;
   create(dodoitsu: CreateDodoitsuDto, author?: User): Promise<Dodoitsu>;
   save(dodoitsu: Dodoitsu): Promise<Dodoitsu>;
-  like(dodoitsu: Dodoitsu, user: User): Promise<void>;
-  unlike(dodoitsu: Dodoitsu, user: User): Promise<void>;
+  like(dodoitsu: Dodoitsu, user: User): void;
+  unlike(dodoitsu: Dodoitsu, user: User): void;
+  didUserLike(dodoitsuId: string, userId: string): Promise<boolean>;
 }
 export const SYMBOL = Symbol('IDodoitsuRepository');
