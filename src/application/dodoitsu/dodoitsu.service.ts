@@ -86,4 +86,54 @@ export class DodoitsuApplicationService {
     const dodoitsu = await this.dodoitsuDomainService.findOne(id);
     return this.dodoitsuDomainService.unlikeDodoitsu(dodoitsu, user);
   }
+
+  async findDodoitsuByUserId(
+    userId: string,
+    page: number,
+    limit: number,
+  ): Promise<ResponseDodoitsuDto[]> {
+    const dodoitsuList = await this.dodoitsuDomainService.findByUserId(
+      userId,
+      page,
+      limit,
+    );
+
+    const responseDodoitsuList = await Promise.all(
+      dodoitsuList.map(async (dodoitsu) => {
+        const isLiked = await this.dodoitsuDomainService.didUserLike(
+          dodoitsu.id,
+          userId,
+        );
+        return new ResponseDodoitsuDto(dodoitsu, isLiked);
+      }),
+    );
+    return responseDodoitsuList;
+  }
+
+  async countDodoitsuByUserId(userId: string): Promise<number> {
+    return this.dodoitsuDomainService.countByUserId(userId);
+  }
+
+  async findLikedDodoitsuByUserId(
+    userId: string,
+    page: number,
+    limit: number,
+  ): Promise<ResponseDodoitsuDto[]> {
+    const dodoitsuList = await this.dodoitsuDomainService.findLikedByUserId(
+      userId,
+      page,
+      limit,
+    );
+
+    const responseDodoitsuList = await Promise.all(
+      dodoitsuList.map((dodoitsu) => {
+        return new ResponseDodoitsuDto(dodoitsu, true); // 既にいいねされているのでisLikedはtrue
+      }),
+    );
+    return responseDodoitsuList;
+  }
+
+  async countLikedDodoitsuByUserId(userId: string): Promise<number> {
+    return this.dodoitsuDomainService.countLikedByUserId(userId);
+  }
 }

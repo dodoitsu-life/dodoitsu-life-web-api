@@ -104,4 +104,38 @@ export class DodoitsuController {
     await this.dodoitsuApplicationService.unlikeDodoitsu(id, req.user.id);
     return ApiResponse.success(null);
   }
+
+  @UseGuards(OptionalJwtAuthGuard)
+  @Get('user/:userId')
+  @HttpCode(HttpStatus.OK)
+  async findByUserId(
+    @Param('userId') userId: string,
+    @Query('page', new DefaultValuePipe(1), ParseIntPipe) page: number,
+    @Query('limit', new DefaultValuePipe(10), ParseIntPipe) limit: number,
+  ): Promise<ApiResponse<ResponseDodoitsuDto[]>> {
+    const [dodoitsuList, allCount] = await Promise.all([
+      this.dodoitsuApplicationService.findDodoitsuByUserId(userId, page, limit),
+      this.dodoitsuApplicationService.countDodoitsuByUserId(userId),
+    ]);
+    return ApiResponse.success(dodoitsuList, allCount);
+  }
+
+  @UseGuards(OptionalJwtAuthGuard)
+  @Get('user/:userId/liked')
+  @HttpCode(HttpStatus.OK)
+  async findLikedByUserId(
+    @Param('userId') userId: string,
+    @Query('page', new DefaultValuePipe(1), ParseIntPipe) page: number,
+    @Query('limit', new DefaultValuePipe(10), ParseIntPipe) limit: number,
+  ): Promise<ApiResponse<ResponseDodoitsuDto[]>> {
+    const [dodoitsuList, allCount] = await Promise.all([
+      this.dodoitsuApplicationService.findLikedDodoitsuByUserId(
+        userId,
+        page,
+        limit,
+      ),
+      this.dodoitsuApplicationService.countLikedDodoitsuByUserId(userId),
+    ]);
+    return ApiResponse.success(dodoitsuList, allCount);
+  }
 }
