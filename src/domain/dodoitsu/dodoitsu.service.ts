@@ -67,6 +67,43 @@ export class DodoitsuService {
     return this.dodoitsuRepository.didUserLike(dodoitsuId, userId);
   }
 
+  async findByUserId(
+    userId: string,
+    page: number,
+    limit: number,
+  ): Promise<Dodoitsu[]> {
+    return this.dodoitsuRepository.findByUser(
+      {
+        take: limit,
+        skip: (page - 1) * limit,
+        order: { createdAt: 'DESC' },
+      },
+      userId,
+    );
+  }
+
+  async countByUserId(userId: string): Promise<number> {
+    return this.dodoitsuRepository.countByUser(userId);
+  }
+
+  async findLikedByUserId(
+    userId: string,
+    page: number,
+    limit: number,
+  ): Promise<Dodoitsu[]> {
+    return this.dodoitsuRepository.findLikedByUser(
+      {
+        take: limit,
+        skip: (page - 1) * limit,
+      },
+      userId,
+    );
+  }
+
+  async countLikedByUserId(userId: string): Promise<number> {
+    return this.dodoitsuRepository.countLikedByUser(userId);
+  }
+
   private async findDodoitsuByOrder(
     page: number,
     limit: number,

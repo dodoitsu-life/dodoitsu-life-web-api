@@ -52,6 +52,44 @@ export class DodoitsuRepository implements IDodoitsuRepository {
     return dodoitsu;
   }
 
+  async findByUser(options: FindOptions, userId: string): Promise<Dodoitsu[]> {
+    const dodoitsuList = await this.entityManager.find(Dodoitsu, {
+      where: { author: { id: userId } },
+      ...options,
+      relations: ['author', 'likes'],
+    });
+    return dodoitsuList;
+  }
+
+  async countByUser(userId: string): Promise<number> {
+    return await this.entityManager.count(Dodoitsu, {
+      where: { author: { id: userId } },
+    });
+  }
+
+  async findLikedByUser(
+    options: FindOptions,
+    userId: string,
+  ): Promise<Dodoitsu[]> {
+    const likedDodoitsuList = await this.entityManager
+      .getRepository(DodoitsuLike)
+      .createQueryBuilder('dodoitsuLike')
+      .leftJoinAndSelect('dodoitsuLike.dodoitsu', 'dodoitsu')
+      .leftJoinAndSelect('dodoitsu.author', 'user')
+      .where('dodoitsuLike.user.id = :userId', { userId })
+      .skip(options.skip)
+      .take(options.take)
+      .getMany();
+
+    return likedDodoitsuList.map((like) => like.dodoitsu);
+  }
+
+  async countLikedByUser(userId: string): Promise<number> {
+    return await this.entityManager.count(DodoitsuLike, {
+      where: { user: { id: userId } },
+    });
+  }
+
   async count(): Promise<number> {
     return await this.entityManager.count(Dodoitsu);
   }
