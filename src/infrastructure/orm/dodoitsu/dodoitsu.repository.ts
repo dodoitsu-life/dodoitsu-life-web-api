@@ -76,6 +76,7 @@ export class DodoitsuRepository implements IDodoitsuRepository {
       .createQueryBuilder('dodoitsuLike')
       .leftJoinAndSelect('dodoitsuLike.dodoitsu', 'dodoitsu')
       .leftJoinAndSelect('dodoitsu.author', 'user')
+      .leftJoinAndSelect('dodoitsu.likes', 'dodoitsu_like')
       .where('dodoitsuLike.user.id = :userId', { userId })
       .skip(options.skip)
       .take(options.take)

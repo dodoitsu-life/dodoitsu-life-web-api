@@ -36,6 +36,6 @@ import { UserRepository } from '@infrastructure/orm/user/user.repository';
       useClass: UserRepository,
     },
   ],
-  exports: [PassportModule],
+  exports: [],
 })
 export class AuthModule {}
