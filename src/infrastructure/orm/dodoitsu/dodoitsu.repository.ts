@@ -28,17 +28,33 @@ export class DodoitsuRepository implements IDodoitsuRepository {
   }
 
   async findWithLikesOrder(options: FindOptions): Promise<Dodoitsu[]> {
-    const dodoitsuList = await this.entityManager
-      .getRepository(Dodoitsu)
-      .createQueryBuilder('dodoitsu')
-      .leftJoinAndSelect('dodoitsu.likes', 'dodoitsuLike')
-      .leftJoinAndSelect('dodoitsu.author', 'user')
-      .groupBy('dodoitsu.id, user.id, dodoitsuLike.id')
-      .addSelect('COUNT(dodoitsuLike.id)', 'likes_count')
-      .orderBy('likes_count', 'DESC')
-      .skip(options.skip)
-      .take(options.take)
-      .getMany();
+    const nativeDodoitsuList = await this.entityManager.query(`
+      SELECT 
+        dodoitsu.*,
+      COUNT("dodoitsu_like"."id") AS likes_count 
+      FROM 
+        "dodoitsu"
+      LEFT JOIN 
+        dodoitsu_like ON dodoitsu.id = dodoitsu_like."dodoitsuId" 
+      LEFT JOIN 
+        "user" AS author ON dodoitsu."authorId" = author.id 
+      GROUP BY 
+        dodoitsu.id 
+      ORDER BY 
+        likes_count DESC 
+      LIMIT 
+        ${options.take} 
+      OFFSET 
+        ${options.skip};
+    `);
+
+    const promises = nativeDodoitsuList.map(async (dodoitsu) => {
+      return this.entityManager.findOne(Dodoitsu, {
+        where: { id: dodoitsu.id },
+        relations: ['author', 'likes'],
+      });
+    });
+    const dodoitsuList = await Promise.all(promises);
 
     return dodoitsuList;
   }
