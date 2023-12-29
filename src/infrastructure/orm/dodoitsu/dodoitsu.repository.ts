@@ -41,7 +41,7 @@ export class DodoitsuRepository implements IDodoitsuRepository {
       GROUP BY 
         dodoitsu.id 
       ORDER BY 
-        likes_count DESC 
+        likes_count DESC, dodoitsu."createdAt" DESC
       LIMIT 
         ${options.take} 
       OFFSET 
