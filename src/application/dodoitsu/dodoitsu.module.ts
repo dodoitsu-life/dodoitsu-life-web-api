@@ -13,6 +13,7 @@ import { DodoitsuController } from '@application/dodoitsu/dodoitsu.controller';
 import { DodoitsuApplicationService } from '@application/dodoitsu/dodoitsu.service';
 import { DodoitsuService } from '@domain/dodoitsu/dodoitsu.service';
 import { UserModule } from '@application/user/user.module';
+import { ThemeModule } from '@application/theme/theme.module';
 
 import { DodoitsuRepository } from '@infrastructure/orm/dodoitsu/dodoitsu.repository';
 import { OptionalJwtStrategy } from '@infrastructure/auth/optional-jwt.strategy';
@@ -23,6 +24,7 @@ import { OptionalJwtStrategy } from '@infrastructure/auth/optional-jwt.strategy'
     JwtModule,
     ConfigModule,
     UserModule,
+    ThemeModule,
   ],
   controllers: [DodoitsuController],
   providers: [

@@ -10,6 +10,7 @@ import { Dodoitsu } from '@domain/dodoitsu/dodoitsu.entity';
 import { DodoitsuLike } from '@domain/dodoitsu/dodoitsu-like.entity';
 
 import { User } from '@domain/user/user.entity';
+import { Theme } from '@/domain/theme/theme.entity';
 import { CreateDodoitsuDto } from '@application/dodoitsu/dto/create-dodoitsu.dto';
 
 @Injectable()
@@ -22,12 +23,19 @@ export class DodoitsuRepository implements IDodoitsuRepository {
   async find(options: FindOptions): Promise<Dodoitsu[]> {
     const dodoitsuList = await this.entityManager.find(Dodoitsu, {
       ...options,
-      relations: ['author', 'likes'],
+      relations: ['author', 'likes', 'theme'],
     });
     return dodoitsuList;
   }
 
   async findWithLikesOrder(options: FindOptions): Promise<Dodoitsu[]> {
+    let whereClause = '';
+
+    // options.themeIdが提供され、空文字でない場合、WHERE句を構築
+    if (options.where.theme.id && options.where.theme.id.trim() !== '') {
+      whereClause = `WHERE dodoitsu."themeId" = '${options.where.theme.id}'`;
+    }
+
     const nativeDodoitsuList = await this.entityManager.query(`
       SELECT 
         dodoitsu.*,
@@ -38,6 +46,9 @@ export class DodoitsuRepository implements IDodoitsuRepository {
         dodoitsu_like ON dodoitsu.id = dodoitsu_like."dodoitsuId" 
       LEFT JOIN 
         "user" AS author ON dodoitsu."authorId" = author.id 
+      LEFT JOIN 
+        theme ON dodoitsu."themeId" = theme.id 
+      ${whereClause}
       GROUP BY 
         dodoitsu.id 
       ORDER BY 
@@ -51,7 +62,7 @@ export class DodoitsuRepository implements IDodoitsuRepository {
     const promises = nativeDodoitsuList.map(async (dodoitsu) => {
       return this.entityManager.findOne(Dodoitsu, {
         where: { id: dodoitsu.id },
-        relations: ['author', 'likes'],
+        relations: ['author', 'likes', 'theme'],
       });
     });
     const dodoitsuList = await Promise.all(promises);
@@ -62,7 +73,7 @@ export class DodoitsuRepository implements IDodoitsuRepository {
   async findOne(id: string): Promise<Dodoitsu> {
     const dodoitsu = await this.entityManager.findOne(Dodoitsu, {
       where: { id },
-      relations: ['author', 'likes'],
+      relations: ['author', 'likes', 'theme'],
     });
 
     return dodoitsu;
@@ -72,7 +83,7 @@ export class DodoitsuRepository implements IDodoitsuRepository {
     const dodoitsuList = await this.entityManager.find(Dodoitsu, {
       where: { author: { id: userId } },
       ...options,
-      relations: ['author', 'likes'],
+      relations: ['author', 'likes', 'theme'],
     });
     return dodoitsuList;
   }
@@ -92,6 +103,7 @@ export class DodoitsuRepository implements IDodoitsuRepository {
       .createQueryBuilder('dodoitsuLike')
       .leftJoinAndSelect('dodoitsuLike.dodoitsu', 'dodoitsu')
       .leftJoinAndSelect('dodoitsu.author', 'user')
+      .leftJoinAndSelect('dodoitsu.theme', 'theme')
       .leftJoinAndSelect('dodoitsu.likes', 'dodoitsu_like')
       .where('dodoitsuLike.user.id = :userId', { userId })
       .skip(options.skip)
@@ -114,6 +126,7 @@ export class DodoitsuRepository implements IDodoitsuRepository {
   async create(
     createDodoitsuDto: CreateDodoitsuDto,
     author?: User,
+    theme?: Theme,
   ): Promise<Dodoitsu> {
     const dodoitsu = new Dodoitsu();
     dodoitsu.content = createDodoitsuDto.content;
@@ -121,6 +134,11 @@ export class DodoitsuRepository implements IDodoitsuRepository {
     if (author) {
       dodoitsu.author = author;
     }
+
+    if (theme) {
+      dodoitsu.theme = theme;
+    }
+
     return await dodoitsu;
   }
 
