@@ -6,6 +6,7 @@ import {
   Query,
   DefaultValuePipe,
   ParseIntPipe,
+  Param,
 } from '@nestjs/common';
 import { ApiOperation, ApiQuery, ApiTags } from '@nestjs/swagger';
 import { ApiResponse } from '@common/ApiResponse';
@@ -43,5 +44,18 @@ export class ThemeController {
       this.themeApplicationService.countCurrentOrPastTheme(),
     ]);
     return ApiResponse.success(themeList, allCount);
+  }
+
+  @ApiOperation({
+    description: 'IDから、テーマを一件取得する',
+  })
+  @ApiTags('theme')
+  @Get(':id')
+  @HttpCode(HttpStatus.OK)
+  async findOne(
+    @Param('id') id: string,
+  ): Promise<ApiResponse<ResponseThemeDto>> {
+    const theme = await this.themeApplicationService.findOneTheme(id);
+    return ApiResponse.success(theme);
   }
 }

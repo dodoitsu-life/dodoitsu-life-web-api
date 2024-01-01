@@ -9,7 +9,7 @@ export interface FindOptions {
 }
 
 export interface IThemeRepository {
-  findOne(id: number): Promise<Theme | null>;
+  findOne(id: string): Promise<Theme | null>;
   count(): Promise<number>;
   countCurrentOrPast(): Promise<number>;
   findCurrentOrPast(options: FindOptions): Promise<Theme[]>;

@@ -29,7 +29,7 @@ export class ThemeRepository implements IThemeRepository {
     return theme;
   }
 
-  async findOne(id: number): Promise<Theme> {
+  async findOne(id: string): Promise<Theme> {
     const theme = await this.entityManager.findOne(Theme, {
       where: { id },
     });

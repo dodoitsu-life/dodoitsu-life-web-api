@@ -29,4 +29,9 @@ export class ThemeApplicationService {
     );
     return responseThemeList;
   }
+
+  async findOneTheme(id: string): Promise<ResponseThemeDto> {
+    const theme = await this.themeDomainService.findOne(id);
+    return new ResponseThemeDto(theme);
+  }
 }
