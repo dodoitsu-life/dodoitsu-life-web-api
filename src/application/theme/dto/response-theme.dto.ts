@@ -14,7 +14,7 @@ export class ResponseThemeDto {
   @IsNumber()
   @IsNotEmpty()
   @ApiProperty()
-  readonly id: number;
+  readonly id: string;
 
   @IsString()
   @IsNotEmpty()

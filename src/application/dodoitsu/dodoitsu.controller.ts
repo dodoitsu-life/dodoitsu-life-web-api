@@ -86,7 +86,7 @@ export class DodoitsuController {
   @ApiQuery({
     name: 'themeId',
     required: false,
-    type: Number,
+    type: String,
   })
   @UseGuards(OptionalJwtAuthGuard)
   @Get('popular')
@@ -95,7 +95,7 @@ export class DodoitsuController {
     @Req() req,
     @Query('page', new DefaultValuePipe(1), ParseIntPipe) page: number,
     @Query('limit', new DefaultValuePipe(10), ParseIntPipe) limit: number,
-    @Query('themeId', new DefaultValuePipe(undefined)) themeId: number,
+    @Query('themeId', new DefaultValuePipe(undefined)) themeId: string,
   ): Promise<ApiResponse<ResponseDodoitsuDto[]>> {
     const [dodoitsuList, allCount] = await Promise.all([
       this.dodoitsuApplicationService.findPopularDodoitsu(
@@ -134,7 +134,7 @@ export class DodoitsuController {
   @ApiQuery({
     name: 'themeId',
     required: false,
-    type: Number,
+    type: String,
   })
   @UseGuards(OptionalJwtAuthGuard)
   @Post()
@@ -142,7 +142,7 @@ export class DodoitsuController {
   async create(
     @Req() req,
     @Body() createDodoitsuDto: CreateDodoitsuDto,
-    @Query('themeId', new DefaultValuePipe(undefined)) themeId: number,
+    @Query('themeId', new DefaultValuePipe(undefined)) themeId: string,
   ): Promise<ApiResponse<ResponseDodoitsuDto>> {
     const dodoitsu = await this.dodoitsuApplicationService.createDodoitsu(
       createDodoitsuDto,

@@ -44,7 +44,7 @@ export class DodoitsuApplicationService {
     page: number,
     limit: number,
     user?: User,
-    themeId?: number,
+    themeId?: string,
   ): Promise<ResponseDodoitsuDto[]> {
     const dodoitsuList = await this.dodoitsuDomainService.findPopular(
       page,
@@ -77,7 +77,7 @@ export class DodoitsuApplicationService {
   async createDodoitsu(
     dto: CreateDodoitsuDto,
     user?: User,
-    themeId?: number,
+    themeId?: string,
   ): Promise<ResponseDodoitsuDto> {
     const theme = themeId && (await this.themeDomainService.findOne(themeId));
     // theme.startDate ~ theme.endDateの期間中以外の場合、エラーを出し処理を中断するa

@@ -38,7 +38,7 @@ export class DodoitsuService {
   async findPopular(
     page: number,
     limit: number,
-    themeId: number,
+    themeId: string,
   ): Promise<Dodoitsu[]> {
     const totalCount = await this.dodoitsuRepository.count();
     const totalPages = Math.ceil(totalCount / limit);

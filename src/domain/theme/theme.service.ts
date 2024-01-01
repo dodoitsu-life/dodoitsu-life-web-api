@@ -38,7 +38,7 @@ export class ThemeService {
     });
   }
 
-  async findOne(id: number): Promise<Theme> {
+  async findOne(id: string): Promise<Theme> {
     const theme = await this.themeRepository.findOne(id);
     if (!theme) {
       throw new NotFoundException(`Dodoitsu with ID ${id} not found`);
