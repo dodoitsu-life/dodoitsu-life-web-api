@@ -1,4 +1,5 @@
 import { Controller, Get, HttpCode, HttpStatus, Param } from '@nestjs/common';
+import { ApiOperation, ApiTags } from '@nestjs/swagger';
 import { ApiResponse } from '@common/ApiResponse';
 import { ResponseUserDto } from './dto/response-user.dto';
 import { UserApplicationService } from '@application/user/user.service';
@@ -9,6 +10,10 @@ export class UserController {
     private readonly userApplicationService: UserApplicationService,
   ) {}
 
+  @ApiOperation({
+    description: 'ユーザーIDから、ユーザーデータを一件取得する',
+  })
+  @ApiTags('user')
   @Get(':id')
   @HttpCode(HttpStatus.OK)
   async findOne(
