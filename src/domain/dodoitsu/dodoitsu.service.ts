@@ -9,8 +9,6 @@ import { Dodoitsu } from '@domain/dodoitsu/dodoitsu.entity';
 
 import { User } from '@domain/user/user.entity';
 
-import { Theme } from '@domain/theme/theme.entity';
-
 @Injectable()
 export class DodoitsuService {
   constructor(
@@ -22,24 +20,11 @@ export class DodoitsuService {
     return this.dodoitsuRepository.count();
   }
 
-  async findLatest(
-    page: number,
-    limit: number,
-    themeId: number,
-  ): Promise<Dodoitsu[]> {
-    return this.findDodoitsuByOrder(
-      page,
-      limit,
-      { createdAt: 'DESC' },
-      themeId,
-    );
+  async findLatest(page: number, limit: number): Promise<Dodoitsu[]> {
+    return this.findDodoitsuByOrder(page, limit, { createdAt: 'DESC' });
   }
 
-  async findPopular(
-    page: number,
-    limit: number,
-    themeId: number,
-  ): Promise<Dodoitsu[]> {
+  async findPopular(page: number, limit: number): Promise<Dodoitsu[]> {
     const totalCount = await this.dodoitsuRepository.count();
     const totalPages = Math.ceil(totalCount / limit);
 
@@ -54,11 +39,6 @@ export class DodoitsuService {
       },
       take: limit,
       skip: (page - 1) * limit,
-      where: {
-        theme: {
-          id: themeId,
-        },
-      },
     });
   }
 
@@ -70,12 +50,8 @@ export class DodoitsuService {
     return dodoitsu;
   }
 
-  async create(
-    dto: CreateDodoitsuDto,
-    user?: User,
-    theme?: Theme,
-  ): Promise<Dodoitsu> {
-    const dodoitsu = await this.dodoitsuRepository.create(dto, user, theme);
+  async create(dto: CreateDodoitsuDto, user?: User): Promise<Dodoitsu> {
+    const dodoitsu = await this.dodoitsuRepository.create(dto, user);
     return this.dodoitsuRepository.save(dodoitsu);
   }
 
@@ -132,7 +108,6 @@ export class DodoitsuService {
     page: number,
     limit: number,
     order: { [P in keyof Dodoitsu]?: 'ASC' | 'DESC' },
-    themeId?: number,
   ): Promise<Dodoitsu[]> {
     const totalCount = await this.dodoitsuRepository.count();
     const totalPages = Math.ceil(totalCount / limit);
@@ -147,11 +122,6 @@ export class DodoitsuService {
       order,
       take: limit,
       skip: (page - 1) * limit,
-      where: {
-        theme: {
-          id: themeId,
-        },
-      },
     });
   }
 }

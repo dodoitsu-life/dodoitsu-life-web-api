@@ -10,8 +10,6 @@ import { ApiProperty } from '@nestjs/swagger';
 import { Dodoitsu } from '@domain/dodoitsu/dodoitsu.entity';
 import { ResponseUserDto } from '@application/user/dto/response-user.dto';
 
-import { ResponseThemeDto } from '@application/theme/dto/response-theme.dto';
-
 export class ResponseDodoitsuDto {
   constructor(dodoitsu: Dodoitsu, isLiked: boolean) {
     this.id = dodoitsu.id;
@@ -23,9 +21,6 @@ export class ResponseDodoitsuDto {
     this.isLiked = isLiked;
     if (dodoitsu.author) {
       this.author = new ResponseUserDto(dodoitsu.author);
-    }
-    if (dodoitsu.theme) {
-      this.theme = new ResponseThemeDto(dodoitsu.theme);
     }
   }
 
@@ -60,7 +55,4 @@ export class ResponseDodoitsuDto {
 
   @ApiProperty()
   readonly author?: ResponseUserDto;
-
-  @ApiProperty()
-  readonly theme?: ResponseThemeDto;
 }

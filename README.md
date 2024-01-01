@@ -8,7 +8,7 @@ Keys And Tokens の API Key and Secret
 
 ## .env の作成
 
-`$ cp env/.env.docker .env`
+`$ cp env/.env.local .env`
 
 ## docker
 

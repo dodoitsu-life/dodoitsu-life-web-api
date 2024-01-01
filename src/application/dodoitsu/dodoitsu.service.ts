@@ -2,16 +2,11 @@ import { Injectable } from '@nestjs/common';
 import { CreateDodoitsuDto } from '@application/dodoitsu/dto/create-dodoitsu.dto';
 import { ResponseDodoitsuDto } from '@application/dodoitsu/dto/response-dodoitsu.dto';
 import { DodoitsuService } from '@domain/dodoitsu/dodoitsu.service';
-import { ThemeService } from '@domain/theme/theme.service';
-
 import { User } from '@domain/user/user.entity';
 
 @Injectable()
 export class DodoitsuApplicationService {
-  constructor(
-    private readonly dodoitsuDomainService: DodoitsuService,
-    private readonly themeDomainService: ThemeService,
-  ) {}
+  constructor(private readonly dodoitsuDomainService: DodoitsuService) {}
 
   async countAllDodoitsu(): Promise<number> {
     return this.dodoitsuDomainService.countAll();
@@ -21,12 +16,10 @@ export class DodoitsuApplicationService {
     page: number,
     limit: number,
     user?: User,
-    themeId?: number,
   ): Promise<ResponseDodoitsuDto[]> {
     const dodoitsuList = await this.dodoitsuDomainService.findLatest(
       page,
       limit,
-      themeId,
     );
 
     const responseDodoitsuList = await Promise.all(
@@ -44,12 +37,10 @@ export class DodoitsuApplicationService {
     page: number,
     limit: number,
     user?: User,
-    themeId?: number,
   ): Promise<ResponseDodoitsuDto[]> {
     const dodoitsuList = await this.dodoitsuDomainService.findPopular(
       page,
       limit,
-      themeId,
     );
 
     const responseDodoitsuList = await Promise.all(
@@ -77,17 +68,8 @@ export class DodoitsuApplicationService {
   async createDodoitsu(
     dto: CreateDodoitsuDto,
     user?: User,
-    themeId?: number,
   ): Promise<ResponseDodoitsuDto> {
-    const theme = themeId && (await this.themeDomainService.findOne(themeId));
-    // theme.startDate ~ theme.endDateの期間中以外の場合、エラーを出し処理を中断するa
-    if (theme) {
-      const now = new Date();
-      if (now < theme.startDate || now > theme.endDate) {
-        throw new Error('現在はこのお題で都々逸を投稿することはできません。');
-      }
-    }
-    const dodoitsu = await this.dodoitsuDomainService.create(dto, user, theme);
+    const dodoitsu = await this.dodoitsuDomainService.create(dto, user);
     return new ResponseDodoitsuDto(dodoitsu, false);
   }
 

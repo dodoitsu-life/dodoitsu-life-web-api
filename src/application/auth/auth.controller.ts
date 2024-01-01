@@ -9,7 +9,6 @@ import {
   HttpCode,
   HttpStatus,
 } from '@nestjs/common';
-import { ApiOperation, ApiTags } from '@nestjs/swagger';
 import { AuthGuard } from '@nestjs/passport';
 import { ConfigService } from '@nestjs/config';
 
@@ -29,20 +28,11 @@ export class AuthController {
     private readonly configService: ConfigService,
   ) {}
 
-  @ApiOperation({
-    description: 'Twitter OAuth2を使用',
-  })
-  @ApiTags('auth')
   @UseGuards(AuthGuard('twitter'))
   @HttpCode(HttpStatus.OK)
   @Get('twitter')
   async signInWithTwitter() {}
 
-  @ApiOperation({
-    description:
-      'Twitter OAuth2のCallBack。ユーザーデータをUPSERTし、JWTトークンを取得。フロントエンドのコールバックURLにtoken付きでリダイレクトする',
-  })
-  @ApiTags('auth')
   @UseGuards(AuthGuard('twitter'))
   @HttpCode(HttpStatus.OK)
   @Get('twitter/callback')
@@ -56,10 +46,6 @@ export class AuthController {
     );
   }
 
-  @ApiOperation({
-    description: 'トークンのリフレッシュ',
-  })
-  @ApiTags('auth')
   @Post('refresh-token')
   @HttpCode(HttpStatus.OK)
   async refreshToken(@Body() body: TokenRefreshDto) {
@@ -69,10 +55,6 @@ export class AuthController {
     return tokens;
   }
 
-  @ApiOperation({
-    description: 'トークンをもとにログインユーザー自身のデータを取得する',
-  })
-  @ApiTags('auth')
   @UseGuards(AuthGuard('jwt'))
   @HttpCode(HttpStatus.OK)
   @Get('me')
@@ -81,10 +63,6 @@ export class AuthController {
     return ApiResponse.success(user);
   }
 
-  @ApiOperation({
-    description: 'ログアウト',
-  })
-  @ApiTags('auth')
   @Post('logout')
   async logout(@Body() body) {
     await this.authService.invalidateRefreshToken(body.refreshToken);
