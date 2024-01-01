@@ -3,6 +3,8 @@ import { CreateDodoitsuDto } from '@application/dodoitsu/dto/create-dodoitsu.dto
 
 import { User } from '@domain/user/user.entity';
 
+import { Theme } from '@domain/theme/theme.entity';
+
 export interface FindOptions {
   order?: {
     [P in keyof Dodoitsu]?: 'ASC' | 'DESC';
@@ -10,6 +12,9 @@ export interface FindOptions {
   skip?: number;
   take?: number;
   orderDirection?: 'ASC' | 'DESC';
+  where?: {
+    [P in keyof Dodoitsu]?: any;
+  };
 }
 
 export interface IDodoitsuRepository {
@@ -21,7 +26,11 @@ export interface IDodoitsuRepository {
   countByUser(userId: string): Promise<number>;
   findLikedByUser(options: FindOptions, userId: string): Promise<Dodoitsu[]>;
   countLikedByUser(userId: string): Promise<number>;
-  create(dodoitsu: CreateDodoitsuDto, author?: User): Promise<Dodoitsu>;
+  create(
+    dodoitsu: CreateDodoitsuDto,
+    author?: User,
+    theme?: Theme,
+  ): Promise<Dodoitsu>;
   save(dodoitsu: Dodoitsu): Promise<Dodoitsu>;
   like(dodoitsu: Dodoitsu, user: User): void;
   unlike(dodoitsu: Dodoitsu, user: User): void;
