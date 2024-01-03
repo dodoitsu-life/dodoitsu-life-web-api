@@ -14,15 +14,17 @@ Keys And Tokens の API Key and Secret
 
 1. image の build
    `$ docker-compose -f docker-compose.dev.yaml build`
-2. nest-app コンテナに入り、.env を編集する
-   a. `$ docker-compose -f docker-compose.dev.yaml run nest-app bash`
-   b. `$ vi .env`
-   c. 「Twitter Consumer Keys の取得」にて取得した Secret を `TWITTER_CONSUMER_KEY`、`TWITTER_CONSUMER_SECRET` に入力する
-   d. 保存して閉じる（`Esc -> :wq`）
-3. コンテナの起動
+2. コンテナの起動
    `$ docker-compose -f docker-compose.dev.yaml up`
+3. Migration, Seed の流し込み（初回のみ）
+   a. `.env`の`DB_HOST='postgres'`を、`DB_HOST='localhost'`に一時的に書き換える
+   b. `$ yarn migration:run`
+   c. `$ yarn seed:run`
+   d. `.env`の設定を戻しておく
 
-## migration 周り
+## DB 周り
+
+### migration
 
 - migration ファイルの生成
   `$ yarn migration:generate src/infrastructure/orm/migrations/${prefix}${table}`
@@ -42,6 +44,10 @@ Keys And Tokens の API Key and Secret
 
 - migration の実行
   `$ yarn migration:run`
+
+### Seed の流し込み
+
+`$ yarn seed:run`
 
 ## app
 

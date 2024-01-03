@@ -21,9 +21,9 @@ export class ThemeRepository implements IThemeRepository {
       where: {
         startDate: LessThanOrEqual(currentDate),
       },
-      //   order: {
-      //     endDate: 'ASC',
-      //   },
+      order: {
+        endDate: 'DESC',
+      },
       ...options,
     });
     return theme;
