@@ -154,4 +154,31 @@ export class DodoitsuApplicationService {
   async countLikedDodoitsuByUserId(userId: string): Promise<number> {
     return this.dodoitsuDomainService.countLikedByUserId(userId);
   }
+
+  async findDodoitsuByThemeId(
+    themeId: string,
+    page: number,
+    limit: number,
+    user?: User,
+  ): Promise<ResponseDodoitsuDto[]> {
+    const dodoitsuList = await this.dodoitsuDomainService.findByThemeId(
+      themeId,
+      page,
+      limit,
+    );
+
+    const responseDodoitsuList = await Promise.all(
+      dodoitsuList.map(async (dodoitsu) => {
+        const isLiked = user
+          ? await this.dodoitsuDomainService.didUserLike(dodoitsu.id, user.id)
+          : false;
+        return new ResponseDodoitsuDto(dodoitsu, isLiked);
+      }),
+    );
+    return responseDodoitsuList;
+  }
+
+  async countDodoitsuByThemeId(themeId: string): Promise<number> {
+    return this.dodoitsuDomainService.countByThemeId(themeId);
+  }
 }

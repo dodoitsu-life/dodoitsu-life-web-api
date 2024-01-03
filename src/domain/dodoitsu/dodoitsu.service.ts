@@ -128,6 +128,20 @@ export class DodoitsuService {
     return this.dodoitsuRepository.countLikedByUser(userId);
   }
 
+  async findByThemeId(
+    themeId: string,
+    page: number,
+    limit: number,
+  ): Promise<Dodoitsu[]> {
+    return this.dodoitsuRepository.findByTheme(
+      {
+        take: limit,
+        skip: (page - 1) * limit,
+      },
+      themeId,
+    );
+  }
+
   private async findDodoitsuByOrder(
     page: number,
     limit: number,
@@ -153,5 +167,9 @@ export class DodoitsuService {
         },
       },
     });
+  }
+
+  async countByThemeId(themeId: string): Promise<number> {
+    return this.dodoitsuRepository.countByTheme(themeId);
   }
 }
