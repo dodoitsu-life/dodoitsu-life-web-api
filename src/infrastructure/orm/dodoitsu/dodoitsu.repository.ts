@@ -119,6 +119,24 @@ export class DodoitsuRepository implements IDodoitsuRepository {
     });
   }
 
+  async findByTheme(
+    options: FindOptions,
+    themeId: string,
+  ): Promise<Dodoitsu[]> {
+    const dodoitsuList = await this.entityManager.find(Dodoitsu, {
+      where: { theme: { id: themeId } },
+      ...options,
+      relations: ['author', 'likes', 'theme'],
+    });
+    return dodoitsuList;
+  }
+
+  async countByTheme(themeId: string): Promise<number> {
+    return await this.entityManager.count(Dodoitsu, {
+      where: { theme: { id: themeId } },
+    });
+  }
+
   async count(): Promise<number> {
     return await this.entityManager.count(Dodoitsu);
   }

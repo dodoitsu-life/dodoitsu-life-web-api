@@ -26,6 +26,8 @@ export interface IDodoitsuRepository {
   countByUser(userId: string): Promise<number>;
   findLikedByUser(options: FindOptions, userId: string): Promise<Dodoitsu[]>;
   countLikedByUser(userId: string): Promise<number>;
+  findByTheme(options: FindOptions, themeId: string): Promise<Dodoitsu[]>;
+  countByTheme(themeId: string): Promise<number>;
   create(
     dodoitsu: CreateDodoitsuDto,
     author?: User,

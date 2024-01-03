@@ -77,10 +77,12 @@ const generateDodoitsus = async (args: GenerateDodoitsusArgs) => {
     userRepository.find(),
   ]);
 
-  // 受付が終了しているお題
-  const closeTheme = themes[0];
   // 受付中のお題
-  const activeTheme = themes[1];
+  const activeTheme = themes.find(
+    (theme) => theme.title === '現在進行中のテーマ',
+  );
+  // 受付が終了しているお題
+  const closeTheme = themes.find((theme) => theme.title === '過去のテーマ');
 
   // 投稿を行うユーザー
   const postedUser = users[0];
