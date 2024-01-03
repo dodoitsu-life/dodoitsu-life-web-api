@@ -43,11 +43,6 @@ export class DodoitsuController {
     required: false,
     type: Number,
   })
-  @ApiQuery({
-    name: 'themeId',
-    required: false,
-    type: Number,
-  })
   @UseGuards(OptionalJwtAuthGuard)
   @Get('latest')
   @HttpCode(HttpStatus.OK)
@@ -55,15 +50,9 @@ export class DodoitsuController {
     @Req() req,
     @Query('page', new DefaultValuePipe(1), ParseIntPipe) page: number,
     @Query('limit', new DefaultValuePipe(10), ParseIntPipe) limit: number,
-    @Query('themeId', new DefaultValuePipe(undefined)) themeId: number,
   ): Promise<ApiResponse<ResponseDodoitsuDto[]>> {
     const [dodoitsuList, allCount] = await Promise.all([
-      this.dodoitsuApplicationService.findLatestDodoitsu(
-        page,
-        limit,
-        req.user,
-        themeId,
-      ),
+      this.dodoitsuApplicationService.findLatestDodoitsu(page, limit, req.user),
       this.dodoitsuApplicationService.countAllDodoitsu(),
     ]);
     return ApiResponse.success(dodoitsuList, allCount);
@@ -83,11 +72,6 @@ export class DodoitsuController {
     required: false,
     type: Number,
   })
-  @ApiQuery({
-    name: 'themeId',
-    required: false,
-    type: String,
-  })
   @UseGuards(OptionalJwtAuthGuard)
   @Get('popular')
   @HttpCode(HttpStatus.OK)
@@ -95,14 +79,12 @@ export class DodoitsuController {
     @Req() req,
     @Query('page', new DefaultValuePipe(1), ParseIntPipe) page: number,
     @Query('limit', new DefaultValuePipe(10), ParseIntPipe) limit: number,
-    @Query('themeId', new DefaultValuePipe(undefined)) themeId: string,
   ): Promise<ApiResponse<ResponseDodoitsuDto[]>> {
     const [dodoitsuList, allCount] = await Promise.all([
       this.dodoitsuApplicationService.findPopularDodoitsu(
         page,
         limit,
         req.user,
-        themeId,
       ),
       this.dodoitsuApplicationService.countAllDodoitsu(),
     ]);
@@ -128,7 +110,7 @@ export class DodoitsuController {
   }
 
   @ApiOperation({
-    description: 'テーマIDから、都々逸を一覧取得する',
+    description: '都々逸を作成する',
   })
   @ApiTags('dodoitsu')
   @ApiQuery({
@@ -233,6 +215,41 @@ export class DodoitsuController {
         limit,
       ),
       this.dodoitsuApplicationService.countLikedDodoitsuByUserId(userId),
+    ]);
+    return ApiResponse.success(dodoitsuList, allCount);
+  }
+
+  @ApiOperation({
+    description: 'お題IDから、お題に投稿されている都々逸を一覧取得する',
+  })
+  @ApiTags('dodoitsu')
+  @ApiQuery({
+    name: 'page',
+    required: false,
+    type: Number,
+  })
+  @ApiQuery({
+    name: 'limit',
+    required: false,
+    type: Number,
+  })
+  @UseGuards(OptionalJwtAuthGuard)
+  @Get('theme/:themeId')
+  @HttpCode(HttpStatus.OK)
+  async finByThemeId(
+    @Req() req,
+    @Param('themeId') themeId: string,
+    @Query('page', new DefaultValuePipe(1), ParseIntPipe) page: number,
+    @Query('limit', new DefaultValuePipe(10), ParseIntPipe) limit: number,
+  ): Promise<ApiResponse<ResponseDodoitsuDto[]>> {
+    const [dodoitsuList, allCount] = await Promise.all([
+      this.dodoitsuApplicationService.findDodoitsuByThemeId(
+        themeId,
+        page,
+        limit,
+        req.user,
+      ),
+      this.dodoitsuApplicationService.countDodoitsuByThemeId(themeId),
     ]);
     return ApiResponse.success(dodoitsuList, allCount);
   }
